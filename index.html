@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neora — Electric Vehicles</title>
+  <style>
+    /* ──────────────────────────────────────────
+       FONTS
+    ────────────────────────────────────────── */
+    @font-face {
+      font-family: 'Zalando Sans Expanded';
+      src: local('Zalando Sans Expanded');
+      font-weight: 400 900;
+    }
+    @font-face {
+      font-family: 'Zalando Sans';
+      src: local('Zalando Sans');
+      font-weight: 400 700;
+    }
+
+    /* ──────────────────────────────────────────
+       RESET & BASE
+    ────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: auto; }
+
+    body {
+      background: #02050D;
+      color: #F8F9FA;
+      font-family: 'Zalando Sans', 'Arial Narrow', Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ──────────────────────────────────────────
+       SECTION 1 — HERO (video + UI reveal)
+    ────────────────────────────────────────── */
+    #hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background: #000;
+    }
+
+    /* The video fills the viewport */
+    #hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    /* Dark overlay — matches Figma group with blend mode overlay */
+    #hero-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      /* gradient darkening top like in Figma: from #1f1d1d downward */
+      background:
+        linear-gradient(to bottom, rgba(2,5,13,0.72) 0%, rgba(2,5,13,0.18) 45%, rgba(2,5,13,0.55) 100%);
+      pointer-events: none;
+    }
+
+    /* All hero UI elements sit above overlay */
+    #hero-ui {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #hero-ui.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ── HEADER / NAV ── */
+    #hero-nav {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 24px 40px;
+    }
+
+    .nav-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(28, 28, 31, 0.50);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 200px;
+      padding: 12px 12px 12px 44px;
+      box-shadow: 0 4px 4px rgba(20,19,21,0.30);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 60px;
+      flex: 1;
+    }
+
+    .nav-links a {
+      font-family: 'Zalando Sans Expanded', 'Arial Narrow', Arial, sans-serif;
+      font-weight: 500;
+      font-size: clamp(14px, 1.25vw, 24px);
+      color: #F8F9FA;
+      opacity: 0.80;
+      text-decoration: none;
+      white-space: nowrap;
+      letter-spacing: -0.01em;
+      transition: opacity 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; }
+
+    .nav-logo {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* SVG logo mark (N stylized) */
+    .nav-logo svg {
+      height: clamp(24px, 2vw, 38px);
+      width: auto;
+    }
+
+    .nav-cta {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(248, 249, 250, 0.95);
+      color: #02050D;
+      border: none;
+      border-radius: 200px;
+      padding: clamp(12px, 0.85vw, 16px) clamp(20px, 1.67vw, 32px);
+      font-family: 'Zalando Sans Expanded', 'Arial Narrow', Arial, sans-serif;
+      font-weight: 600;
+      font-size: clamp(13px, 1.25vw, 24px);
+      letter-spacing: -0.005em;
+      white-space: nowrap;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover {
+      background: #fff;
+      transform: scale(1.02);
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(40, 40, 40, 0.10);
+      color: #F8F9FA;
+      border: 1.5px solid rgba(248,249,250,0.25);
+      border-radius: 200px;
+      padding: clamp(12px, 0.85vw, 16px) clamp(20px, 1.67vw, 32px);
+      font-family: 'Zalando Sans Expanded', 'Arial Narrow', Arial, sans-serif;
+      font-weight: 700;
+      font-size: clamp(13px, 1.04vw, 20px);
+      letter-spacing: -0.005em;
+      white-space: nowrap;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .btn-ghost:hover {
+      border-color: rgba(248,249,250,0.6);
+      transform: scale(1.02);
+    }
+
+    /* ── HERO HEADLINE ── */
+    #hero-headline {
+      position: absolute;
+      left: clamp(40px, 4.5vw, 277px);
+      top: clamp(140px, 18vh, 183px);
+      max-width: 80vw;
+
+      font-family: 'Zalando Sans Expanded', 'Arial Narrow', Arial, sans-serif;
+      font-weight: 500;
+      font-size: clamp(36px, 5vw, 96px);
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+
+      /* gradient text white → light-grey */
+      background: linear-gradient(180deg, #fff 0%, #dcdcdc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── HERO BOTTOM BAR ── */
+    #hero-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0 clamp(30px, 3.1vw, 60px) 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding-bottom: clamp(24px, 2.4vh, 48px);
+      min-height: 151px;
+    }
+
+    #hero-model-name {
+      max-width: 300px;
+    }
+
+    #hero-model-name .model-title {
+      font-family: 'Zalando Sans Expanded', 'Arial Narrow', Arial, sans-serif;
+      font-weight: 600;
+      font-size: clamp(28px, 2.7vw, 52px);
+      line-height: 1.37;
+      color: #F8F9FA;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    #hero-model-name .model-sub {
+      font-family: 'Zalando Sans', Arial, sans-serif;
+      font-weight: 400;
+      font-size: clamp(14px, 1.25vw, 24px);
+      color: #E3E4E5;
+      line-height: 1.25;
+    }
+
+    #hero-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      width: clamp(200px, 16vw, 307px);
+    }
+
+    #hero-actions .btn-primary,
+    #hero-actions .btn-ghost {
+      width: 100%;
+      font-size: clamp(13px, 1.04vw, 20px);
+    }
+
+
+    /* ──────────────────────────────────────────
+       SCROLL TRIGGER SPACER
+       This tall div makes the page scrollable so
+       the video can play through while the hero
+       stays "sticky" in view.
+    ────────────────────────────────────────── */
+    #scroll-driver {
+      /* hero is 100vh, we give extra 200vh so the
+         user scrolls while video plays. */
+      height: 300vh;
+      position: relative;
+    }
+
+    /* The sticky wrapper holds hero in place during scroll */
+    #sticky-hero {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      width: 100%;
+    }
+
+    /* ──────────────────────────────────────────
+       SECTION 2 — NEORA X1 DETAILS (metrics)
+    ────────────────────────────────────────── */
+    #section2 {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background: #02050D;
+    }
+
+    /* The same video continues in section 2 — we'll use a clone */
+    #section2-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    #section2-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(to bottom, rgba(2,5,13,0.72) 0%, rgba(2,5,13,0.25) 40%, rgba(2,5,13,0.60) 100%);
+      pointer-events: none;
+    }
+
+    /* Section 2 UI — fades in when video ends */
+    #section2-ui {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+    }
+
+    /* ── Section 2 Nav (same pill) ── */
+    #section2-nav {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 24px 40px;
+    }
+
+    /* ── Section 2 model info ── */
+    #section2-info {
+      position: absolute;
+      top: clamp(120px, 16.6vh, 174px);
+      left: clamp(30px, 3.1vw, 60px);
+
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1);
+    }
+    #section2-info.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #section2-info .s2-title {
+      font-family: 'Zalando Sans Expanded', 'Arial Narrow', Arial, sans-serif;
+      font-weight: 500;
+      font-size: clamp(32px, 3.3vw, 64px);
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+      color: #F8F9FA;
+      margin-bottom: 12px;
+    }
+
+    #section2-info .s2-sub {
+      font-family: 'Zalando Sans', Arial, sans-serif;
+      font-weight: 400;
+      font-size: clamp(14px, 1.25vw, 24px);
+      color: #E3E4E5;
+      line-height: 1.25;
+      max-width: 464px;
+    }
+
+    /* ── Metrics row ── */
+    #metrics {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0 clamp(30px, 3.1vw, 60px);
+      padding-bottom: clamp(20px, 2vh, 40px);
+      display: flex;
+      gap: clamp(8px, 0.83vw, 16px);
+    }
+
+    .metric-card {
+      flex: 1;
+      background: rgba(40, 40, 40, 0.40);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: clamp(12px, 1.25vw, 24px);
+      padding: clamp(16px, 1.67vw, 32px) clamp(20px, 2vw, 38px);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      opacity: 0;
+      transform: translateX(-24px);
+      transition:
+        opacity 0.6s cubic-bezier(0.4,0,0.2,1),
+        transform 0.6s cubic-bezier(0.4,0,0.2,1);
+    }
+    .metric-card.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .metric-value {
+      font-family: 'Zalando Sans Expanded', 'Arial Narrow', Arial, sans-serif;
+      font-weight: 700;
+      font-size: clamp(28px, 2.7vw, 52px);
+      line-height: 1.12;
+      color: #F8F9FA;
+      white-space: nowrap;
+    }
+
+    .metric-value span.unit {
+      font-weight: 400;
+      font-size: clamp(26px, 2.7vw, 52px);
+    }
+
+    .metric-label {
+      font-family: 'Zalando Sans', Arial, sans-serif;
+      font-weight: 400;
+      font-size: clamp(12px, 1.04vw, 20px);
+      color: #E3E4E5;
+      line-height: 1.12;
+      letter-spacing: -0.005em;
+    }
+
+    /* ──────────────────────────────────────────
+       SECTION 3 — placeholder (so page has
+       somewhere to scroll to after s2)
+    ────────────────────────────────────────── */
+    #section3 {
+      min-height: 100vh;
+      background: #02050D;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #section3 p {
+      font-family: 'Zalando Sans Expanded', 'Arial Narrow', Arial, sans-serif;
+      font-size: 24px;
+      color: rgba(248,249,250,0.2);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ──────────────────────────────────────────
+       SCROLL INDICATOR
+    ────────────────────────────────────────── */
+    #scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      transition: opacity 0.6s;
+      pointer-events: none;
+    }
+    #scroll-hint.visible { opacity: 1; }
+
+    #scroll-hint span {
+      font-family: 'Zalando Sans Expanded', 'Arial Narrow', Arial, sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(248,249,250,0.45);
+    }
+
+    #scroll-hint svg {
+      animation: bounce 1.8s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(7px); }
+    }
+
+    /* ──────────────────────────────────────────
+       REDUCED MOTION
+    ────────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
+      #hero-ui { opacity: 1 !important; }
+      #section2-info { opacity: 1 !important; transform: none !important; }
+      .metric-card { opacity: 1 !important; transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     SCROLL DRIVER — hero stays sticky while
+     the user scrolls through 300vh of space.
+════════════════════════════════════════════════ -->
+<div id="scroll-driver">
+  <div id="sticky-hero">
+
+    <!-- VIDEO -->
+    <video
+      id="hero-video"
+      src="neora-video.mp4"
+      muted
+      playsinline
+      preload="auto"
+    ></video>
+
+    <!-- DARK OVERLAY -->
+    <div id="hero-overlay"></div>
+
+    <!-- UI (hidden until 7.9 s) -->
+    <div id="hero-ui">
+
+      <!-- NAV -->
+      <div id="hero-nav">
+        <div class="nav-pill">
+          <nav class="nav-links">
+            <a href="#">About</a>
+            <a href="#">Models</a>
+            <a href="#">Mission</a>
+          </nav>
+
+          <div class="nav-logo">
+            <!-- Neora wordmark / logo mark — SVG inline -->
+            <svg viewBox="0 0 52 39" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Neora">
+              <path d="M2 37V2L26 37V2" stroke="#F8F9FA" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M26 37V2L50 37V2" stroke="#F8F9FA" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <div class="nav-cta">
+            <a href="#" class="btn-primary">Book a Test Drive</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- HEADLINE -->
+      <h1 id="hero-headline">The future has<br>Arrived.<br>Drive it Today</h1>
+
+      <!-- BOTTOM BAR -->
+      <div id="hero-bottom">
+        <div id="hero-model-name">
+          <span class="model-title">Neora X1</span>
+          <span class="model-sub">— our most advanced<br>electric vehicle ever</span>
+        </div>
+        <div id="hero-actions">
+          <a href="#" class="btn-primary">Book a Test Drive</a>
+          <a href="#" class="btn-ghost">Explore&nbsp;<strong>Neora X1</strong></a>
+        </div>
+      </div>
+
+    </div><!-- /hero-ui -->
+
+    <!-- SCROLL HINT -->
+    <div id="scroll-hint">
+      <span>Scroll</span>
+      <svg width="16" height="24" viewBox="0 0 16 24" fill="none">
+        <path d="M8 4v16M2 14l6 6 6-6" stroke="rgba(248,249,250,0.45)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+  </div><!-- /sticky-hero -->
+</div><!-- /scroll-driver -->
+
+
+<!-- ══════════════════════════════════════════════
+     SECTION 2 — NEORA X1 detail + metrics
+     (appears after scroll completes)
+════════════════════════════════════════════════ -->
+<section id="section2">
+
+  <!-- Same video, frozen on last frame via JS -->
+  <video
+    id="section2-video"
+    src="neora-video.mp4"
+    muted
+    playsinline
+    preload="auto"
+  ></video>
+
+  <div id="section2-overlay"></div>
+
+  <div id="section2-ui">
+
+    <!-- NAV (same pill, always visible) -->
+    <div id="section2-nav">
+      <div class="nav-pill">
+        <nav class="nav-links">
+          <a href="#">About</a>
+          <a href="#">Models</a>
+          <a href="#">Mission</a>
+        </nav>
+        <div class="nav-logo">
+          <svg viewBox="0 0 52 39" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Neora">
+            <path d="M2 37V2L26 37V2" stroke="#F8F9FA" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M26 37V2L50 37V2" stroke="#F8F9FA" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="nav-cta">
+          <a href="#" class="btn-primary">Book a Test Drive</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Model name + tagline -->
+    <div id="section2-info">
+      <p class="s2-title">Neora X1</p>
+      <p class="s2-sub">Built for those who demand performance without compromise.</p>
+    </div>
+
+    <!-- Metrics -->
+    <div id="metrics">
+      <div class="metric-card" data-delay="0">
+        <div class="metric-value">820 <span class="unit">km</span></div>
+        <div class="metric-label">Maximum driving range</div>
+      </div>
+      <div class="metric-card" data-delay="120">
+        <div class="metric-value">2.9 <span class="unit">sec</span></div>
+        <div class="metric-label">0–100 km/h acceleration</div>
+      </div>
+      <div class="metric-card" data-delay="240">
+        <div class="metric-value">15 <span class="unit">min</span></div>
+        <div class="metric-label">Charge from 20% to 80%</div>
+      </div>
+      <div class="metric-card" data-delay="360">
+        <div class="metric-value">1,200 <span class="unit">hp</span></div>
+        <div class="metric-label">Dual-motor performance system</div>
+      </div>
+    </div>
+
+  </div><!-- /section2-ui -->
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SECTION 3 — placeholder
+════════════════════════════════════════════════ -->
+<section id="section3">
+  <p>More coming soon</p>
+</section>
+
+
+<script>
+  /* ──────────────────────────────────────────────
+     State
+  ────────────────────────────────────────────── */
+  const heroVideo   = document.getElementById('hero-video');
+  const heroUi      = document.getElementById('hero-ui');
+  const scrollHint  = document.getElementById('scroll-hint');
+  const scrollDriver = document.getElementById('scroll-driver');
+
+  const s2Video     = document.getElementById('section2-video');
+  const s2Info      = document.getElementById('section2-info');
+  const metricCards = document.querySelectorAll('.metric-card');
+
+  const INTRO_PAUSE_TIME = 7.9;  // seconds — video pauses here on first play
+  let   heroPaused       = false; // true once we've done the 7.9 s pause
+  let   uiRevealed       = false;
+  let   videoEnded       = false;
+  let   metricsShown     = false;
+
+  /* ──────────────────────────────────────────────
+     VIDEO SETUP — autoplay immediately
+  ────────────────────────────────────────────── */
+  heroVideo.play().catch(() => {
+    // Autoplay blocked — show UI immediately
+    revealHeroUi();
+  });
+
+  heroVideo.addEventListener('timeupdate', onHeroTimeUpdate);
+  heroVideo.addEventListener('ended',      onHeroEnded);
+
+  function onHeroTimeUpdate() {
+    if (!heroPaused && heroVideo.currentTime >= INTRO_PAUSE_TIME) {
+      heroPaused = true;
+      // Smooth slow-down instead of instant stop
+      slowDown(heroVideo, 0.4, () => {
+        heroVideo.pause();
+        revealHeroUi();
+      });
+    }
+  }
+
+  function slowDown(video, duration, callback) {
+    const startRate = video.playbackRate;
+    const startTime = performance.now();
+    function step(now) {
+      const t = Math.min((now - startTime) / (duration * 1000), 1);
+      video.playbackRate = startRate * (1 - t);
+      if (t < 1) requestAnimationFrame(step);
+      else { video.playbackRate = 1; callback(); }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function revealHeroUi() {
+    if (uiRevealed) return;
+    uiRevealed = true;
+    heroUi.classList.add('visible');
+    setTimeout(() => scrollHint.classList.add('visible'), 900);
+  }
+
+  function onHeroEnded() {
+    // hero video done — nothing special, section2 video handles display
+  }
+
+  /* ──────────────────────────────────────────────
+     SCROLL LOGIC
+  ────────────────────────────────────────────── */
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  function onScroll() {
+    if (!uiRevealed) return;
+
+    const scrollY        = window.scrollY;
+    const driverHeight   = scrollDriver.offsetHeight;    // 300vh
+    const viewportH      = window.innerHeight;           // 100vh
+    // scrollable range = driverHeight - viewportH  (= 200vh approx)
+    const scrollable     = driverHeight - viewportH;
+    // progress 0 → 1 across the sticky zone
+    const progress       = Math.max(0, Math.min(1, scrollY / scrollable));
+
+    if (progress > 0 && heroPaused) {
+      /* Resume hero video proportionally through its remaining duration */
+      const videoDuration = heroVideo.duration || 20;
+      const remaining     = videoDuration - INTRO_PAUSE_TIME;
+      const targetTime    = INTRO_PAUSE_TIME + remaining * progress;
+
+      if (heroVideo.paused) heroVideo.play();
+      heroVideo.playbackRate = 1;
+      // Seek to match scroll position
+      if (Math.abs(heroVideo.currentTime - targetTime) > 0.15) {
+        heroVideo.currentTime = targetTime;
+      }
+
+      scrollHint.classList.remove('visible');
+    }
+
+    if (progress >= 1) {
+      heroVideo.pause();
+    }
+  }
+
+  /* ──────────────────────────────────────────────
+     SECTION 2 — IntersectionObserver reveals
+  ────────────────────────────────────────────── */
+  const s2 = document.getElementById('section2');
+
+  // When section2 enters viewport — sync section2 video to last frame
+  // and reveal info + metric cards
+  const s2Observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !metricsShown) {
+        metricsShown = true;
+        revealSection2();
+      }
+    });
+  }, { threshold: 0.15 });
+
+  s2Observer.observe(s2);
+
+  function revealSection2() {
+    // Set section2 video to last frame (pause at end)
+    s2Video.addEventListener('loadedmetadata', () => {
+      s2Video.currentTime = s2Video.duration;
+    }, { once: true });
+
+    if (s2Video.readyState >= 1) {
+      s2Video.currentTime = s2Video.duration;
+    }
+
+    // Reveal info text
+    setTimeout(() => s2Info.classList.add('visible'), 100);
+
+    // Stagger metric cards left → right
+    metricCards.forEach((card) => {
+      const delay = parseInt(card.dataset.delay || '0', 10);
+      setTimeout(() => card.classList.add('visible'), 300 + delay);
+    });
+  }
+</script>
+</body>
+</html>
