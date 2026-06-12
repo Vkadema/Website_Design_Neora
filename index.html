@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Neora X1 — The future has arrived</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zalando+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Zalando+Sans+Expanded:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --white-1:#F8F9FA;
+  --white-2:#E3E4E5;
+  --gray:#8A898A;
+  --black:#08090A;
+  --nav-bg:rgba(28,28,31,.5);
+  --card-bg:rgba(40,40,40,0.25);
+  --pill-shadow:0 4px 4px rgba(20,19,21,.3);
+  --exp:"Zalando Sans Expanded","Zalando Sans",system-ui,-apple-system,sans-serif;
+  --sans:"Zalando Sans",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--black);color:var(--white-1);}
+body{font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+img,svg{display:block;}
+
+/* ============================================================
+   SCROLL STRUCTURE
+   .track = 320vh tall; .stage sticks for the full scroll range
+   ============================================================ */
+.track{position:relative;height:320vh;}
+.stage{position:sticky;top:0;height:100vh;width:100%;overflow:hidden;background:var(--black);}
+
+/* full-bleed video */
+.bg-video{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center;
+  background:var(--black);z-index:0;
+}
+
+/* ---- blackout overlay (fades in near end of video) ---- */
+.blackout{position:absolute;inset:0;pointer-events:none;z-index:1;}
+.blk-grad{
+  position:absolute;left:0;top:-2.78vh;width:100%;height:61.1vh;
+  background:linear-gradient(180deg,rgba(31,29,29,var(--blk-a,0)) 0%,rgba(31,29,29,0) 100%);
+  mix-blend-mode:overlay;
+}
+.blk-blur{
+  position:absolute;left:0;top:0;width:100%;height:38.2vh;
+  background:rgba(31,29,29,.01);
+  backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px);
+}
+
+/* ============================================================
+   DESIGN SURFACE — faithful 1920×1080 frame scaled to viewport
+   ============================================================ */
+.design{
+  position:absolute;left:0;top:0;
+  width:1920px;height:1080px;
+  transform-origin:top left;
+  transform:scale(var(--scale,1));
+  z-index:2;
+}
+
+/* ---- NAV ---- */
+.nav{
+  position:absolute;left:0;top:0;width:1920px;
+  padding:20px 40px;z-index:3;
+  opacity:0;will-change:opacity;
+}
+.nav-pill{
+  display:flex;align-items:center;justify-content:space-between;width:100%;
+  padding:12px 12px 12px 24px;border-radius:200px;
+  background:var(--nav-bg);box-shadow:var(--pill-shadow);
+}
+.nav-left{display:flex;align-items:center;gap:32px;flex-shrink:0;}
+.nav-logo svg{width:63.625px;height:38.427px;}
+.nav-links{
+  display:flex;gap:40px;align-items:center;
+  font-family:var(--exp);font-weight:500;font-size:18px;
+  line-height:1.12;color:var(--white-1);white-space:nowrap;
+}
+.nav-links a{color:inherit;text-decoration:none;opacity:.8;}
+.nav-cta-wrap{display:flex;flex:1;flex-direction:column;align-items:flex-end;justify-content:center;}
+.nav-cta{
+  display:flex;align-items:center;justify-content:center;
+  padding:16px 32px;border:0;cursor:pointer;
+  border-radius:200px;background:var(--white-1);
+  font-family:var(--exp);font-weight:600;font-size:18px;
+  line-height:1.12;color:var(--black);white-space:nowrap;
+}
+
+/* ---- SECTION 1 ---- */
+.s1{position:absolute;inset:0;z-index:2;opacity:0;will-change:opacity,transform;}
+
+.headline{
+  position:absolute;
+  left:50%;top:143.55px;
+  transform:translateX(-50%);
+  width:1365px;margin:0;
+  font-family:var(--exp);font-size:90px;font-weight:500;
+  line-height:1.05;letter-spacing:-.9px;
+  text-align:center;
+  background:linear-gradient(180deg,#fff 0%,#dcdcdc 100%);
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;
+}
+.headline strong{font-weight:600;}
+.headline em{
+  font-family:var(--exp);font-weight:500;font-style:italic;
+  -webkit-text-fill-color:#8A898A;color:#8A898A;
+}
+
+/* bottom bar — always 100px from bottom of viewport, scaled back up */
+.s1-bottom{
+  position:fixed;
+  left:0;bottom:100px;
+  width:100vw;
+  z-index:10;
+  pointer-events:none;
+}
+.s1-bottom-inner{
+  /* This inner div matches the 1920px design width and is centered */
+  width:1920px;
+  transform-origin:bottom left;
+  transform:scale(var(--scale,1));
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 70px;
+}
+.s1-left{}
+.s1-model{
+  margin:0 0 12px;font-family:var(--exp);font-weight:600;
+  font-size:52px;line-height:1.12;color:var(--white-1);
+  white-space:nowrap;
+}
+.s1-model em{font-weight:800;font-style:italic;}
+.s1-desc{
+  margin:0;font-family:var(--sans);font-weight:400;
+  font-size:20px;line-height:1.28;color:var(--white-2);
+  width:295px;
+}
+.s1-right{display:flex;flex-direction:column;gap:11px;width:307px;}
+.btn{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;padding:22px 32px;border:0;cursor:pointer;
+  border-radius:200px;font-family:var(--exp);font-weight:600;
+  font-size:20px;line-height:1.12;white-space:nowrap;
+  pointer-events:auto;
+}
+.btn-primary{background:var(--white-1);color:var(--black);}
+.btn-ghost{background:var(--card-bg);color:var(--white-1);}
+
+/* ---- SECTION 2 ---- */
+.s2-title{
+  position:absolute;left:70px;top:169px;z-index:2;
+  display:flex;flex-direction:column;gap:12px;
+  opacity:0;will-change:opacity,transform;
+}
+.s2-h{
+  margin:0;font-family:var(--exp);font-weight:600;
+  font-size:94px;line-height:1.12;letter-spacing:-.96px;
+  color:var(--white-1);white-space:nowrap;
+}
+.s2-h em{font-style:italic;font-weight:700;}
+.s2-sub{
+  margin:0;width:463px;font-family:var(--sans);font-weight:400;
+  font-size:20px;line-height:1.28;color:var(--gray);
+}
+/* metric cards row — pinned to bottom of the design frame */
+.metrics{
+  position:absolute;
+  left:0;bottom:67px;
+  width:1920px;padding:0 70px;
+  z-index:2;
+  display:flex;align-items:center;gap:16px;
+}
+.card{
+  flex:1 0 0;min-width:0;
+  display:flex;flex-direction:column;justify-content:center;gap:10px;
+  padding:28px 38px;border-radius:24px;
+  background:var(--card-bg);
+  /* IntersectionObserver drives this */
+  opacity:0;transform:translateY(20px);
+  will-change:opacity,transform;
+  transition:opacity .6s cubic-bezier(.4,0,.2,1), transform .6s cubic-bezier(.4,0,.2,1);
+}
+.card.revealed{opacity:1;transform:translateY(0);}
+.m-val{margin:0;font-family:var(--exp);line-height:1.12;color:var(--white-1);white-space:nowrap;}
+.m-num{font-weight:700;font-size:50px;}
+.m-unit{font-weight:400;font-size:46px;}
+.m-label{
+  margin:0;font-family:var(--sans);font-weight:400;
+  font-size:20px;line-height:1.12;color:var(--white-2);
+}
+
+/* focus + reduced motion */
+a:focus-visible,button:focus-visible{outline:2px solid var(--white-1);outline-offset:3px;border-radius:200px;}
+@media(prefers-reduced-motion:reduce){
+  .blk-grad{mix-blend-mode:normal;opacity:.6;}
+  .card{transition:none;}
+}
+
+/* ============================================================
+   SECTION 3 — Find your Perfect Match
+   ============================================================ */
+.s3-section{
+  background:#08090a;
+  position:relative;overflow:hidden;
+  /* 1034px in Figma → use 100vh equivalent, ~96vh looks right */
+  min-height:100vh;
+  display:flex;flex-direction:column;
+}
+
+/* section 3 uses the same 1920px design surface trick */
+.s3-design{
+  width:1920px;
+  transform-origin:top left;
+  transform:scale(var(--scale,1));
+  height:1034px; /* matches Figma frame height */
+  flex-shrink:0;
+  position:relative;
+}
+
+/* header text: centered, top area */
+.s3-header{
+  position:absolute;
+  left:50%;top:calc(50% - 376px);
+  transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+  white-space:nowrap;
+  z-index:2;
+}
+.s3-title{
+  margin:0;
+  font-family:var(--exp);font-size:60px;font-weight:700;
+  line-height:1.12;color:var(--white-1);
+}
+.s3-title em{
+  font-family:var(--exp);font-weight:500;font-style:italic;
+  color:var(--gray);
+}
+.s3-subtitle{
+  margin:0;font-family:var(--sans);font-weight:400;
+  font-size:16px;line-height:1.28;color:var(--gray);
+  text-align:center;
+}
+
+/* left panel */
+.s3-left-wrap{
+  position:absolute;
+  left:calc(50% - 650px);top:50%;
+  transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;gap:12px;
+  width:480px;
+  z-index:3;
+}
+
+/* config tabs */
+.s3-config-tabs{
+  display:flex;align-items:center;
+  background:var(--card-bg);
+  border-radius:63px;padding:6px;
+}
+.s3-config-tab{
+  flex:1;height:40px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:60px;border:none;background:transparent;cursor:pointer;
+  font-family:var(--exp);font-weight:500;font-size:16px;line-height:1.12;
+  color:var(--white-1);opacity:.8;
+  transition:background .22s,color .22s,opacity .22s;
+  white-space:nowrap;padding:0 8px;
+}
+.s3-config-tab.active{background:#fff;color:var(--black);font-weight:600;}
+
+/* config card */
+.s3-config-panel{
+  background:var(--card-bg);border-radius:26px;
+  padding:24px;display:flex;flex-direction:column;gap:32px;
+}
+
+/* swatches */
+.s3-swatches{display:flex;gap:10px;height:190px;}
+.s3-swatch{
+  flex:1;border-radius:10px;position:relative;
+  cursor:pointer;transition:transform .18s;overflow:hidden;
+}
+.s3-swatch:hover{transform:scale(1.04);}
+.s3-swatch-inner{position:absolute;inset:0;border-radius:10px;}
+.s3-swatch-border{
+  position:absolute;inset:-2px -3px;border-radius:12px;
+  border:1.5px solid var(--white-1);
+  opacity:0;pointer-events:none;transition:opacity .18s;
+}
+.s3-swatch.selected .s3-swatch-border{opacity:1;}
+.s3-color-label{
+  font-family:var(--sans);font-weight:500;font-size:16px;
+  line-height:1.12;color:var(--gray);display:flex;gap:6px;margin-top:8px;
+}
+
+/* purchase */
+.s3-divider{width:100%;height:1px;background:rgba(248,249,250,.15);}
+.s3-total-row{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding-top:28px;white-space:nowrap;
+}
+.s3-total-label{
+  font-family:var(--sans);font-weight:500;font-size:18px;
+  line-height:1.12;color:var(--gray);
+}
+.s3-total-price{
+  display:flex;align-items:center;gap:4px;
+  font-family:var(--exp);font-weight:600;font-size:26px;
+  line-height:1.12;color:var(--white-1);
+}
+.s3-reserve-btn{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:12px;
+  padding:22px 32px;border-radius:200px;background:var(--white-1);
+  border:none;cursor:pointer;
+  font-family:var(--exp);font-weight:600;font-size:18px;
+  line-height:1.12;color:var(--black);white-space:nowrap;
+  transition:opacity .2s;
+}
+.s3-reserve-btn:hover{opacity:.88;}
+.s3-arrow-icon{width:24px;height:2px;background:var(--black);position:relative;flex-shrink:0;}
+.s3-arrow-icon::after{
+  content:'';position:absolute;right:-1px;top:-4px;
+  width:10px;height:10px;
+  border-right:2px solid var(--black);border-top:2px solid var(--black);
+  transform:rotate(45deg);
+}
+
+/* right panel */
+.s3-right-wrap{
+  position:absolute;
+  right:0;bottom:0;
+  width:1398px;height:801px;
+  z-index:1;
+}
+
+/* model tabs */
+.s3-model-tabs{
+  position:absolute;
+  left:50%;top:calc(50% - 173px);
+  transform:translate(-50%,-50%);
+  /* align to right side like Figma: center of right panel */
+  left:auto;right:0;
+  /* use same centering as Figma node: left calc(50%+338.5px) */
+  display:flex;align-items:center;gap:8px;
+  background:var(--card-bg);border-radius:63px;padding:6px;
+  z-index:4;
+}
+/* override: position relative to s3-design */
+.s3-model-tabs{
+  position:absolute;
+  left:calc(50% + 338.5px);
+  top:calc(50% - 173px);
+  transform:translate(-50%,-50%);
+}
+.s3-model-tab{
+  width:160px;height:40px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:60px;border:none;background:transparent;cursor:pointer;
+  font-family:var(--exp);font-weight:500;font-size:18px;line-height:1.12;
+  color:var(--white-1);opacity:.8;
+  transition:background .28s cubic-bezier(.4,0,.2,1),color .22s,opacity .22s;
+  white-space:nowrap;
+}
+.s3-model-tab.active{background:#fff;color:var(--black);font-weight:600;opacity:.8;}
+
+/* car image */
+.s3-car-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center;
+  opacity:0;
+  transition:opacity .45s cubic-bezier(.4,0,.2,1);
+  will-change:opacity;
+}
+.s3-car-img.visible{opacity:1;}
+
+/* glow + 360 */
+.s3-glow{
+  position:absolute;
+  bottom:70px;left:calc(50% + 338px);
+  transform:translateX(-50%);
+  width:1141px;height:138px;
+  mix-blend-mode:overlay;
+  pointer-events:none;z-index:2;
+}
+.s3-360{
+  position:absolute;
+  bottom:85px;left:1275px;
+  font-family:var(--sans);font-weight:300;font-size:20px;
+  line-height:1.12;color:rgba(255,255,255,.6);
+  mix-blend-mode:overlay;z-index:3;pointer-events:none;
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SECTIONS 1 + 2  (scroll-scrub video block)
+     ============================================================ -->
+<main class="track" id="track">
+  <div class="stage" id="stage">
+    <video class="bg-video" id="video" muted playsinline preload="auto" poster="poster.jpg"></video>
+
+    <!-- blackout -->
+    <div class="blackout" id="blackout">
+      <div class="blk-grad"></div>
+      <div class="blk-grad"></div>
+      <div class="blk-grad"></div>
+      <div class="blk-grad"></div>
+      <div class="blk-blur"></div>
+    </div>
+
+    <div class="design" id="design">
+
+      <!-- NAV -->
+      <header class="nav" id="nav">
+        <div class="nav-pill">
+          <div class="nav-left">
+            <div class="nav-logo" aria-label="Neora">
+              <svg width="64" height="39" viewBox="0 0 52 39" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20.7932 2.21525C21.1266 2.78923 22.4841 4.51694 22.9376 5.12469L28.3511 12.4674C28.7535 13.0237 29.2935 13.5566 29.6565 14.1093C30.5967 13.5544 32.2218 13.0086 33.2657 12.5545C34.5574 11.9927 35.8746 11.6439 37.1184 10.9078C36.7083 11.8551 36.1744 12.6411 35.6923 13.5389C34.8961 15.0198 34.1136 16.4451 33.1805 17.8448C32.8177 18.3893 32.5264 19.0871 32.1815 19.6575C31.4208 20.9157 30.716 22.2039 30.0132 23.4951C27.0015 19.6398 24.0677 15.7243 21.2137 11.7508C21.0794 11.9987 20.9181 12.2393 20.7682 12.4786C18.9959 15.3074 17.4587 18.2811 15.7498 21.1511C14.6609 22.9799 13.5962 24.8615 12.5744 26.7286C11.9828 27.8095 11.1516 28.9247 10.7788 30.0778C11.1507 29.9668 11.5219 29.8532 11.8924 29.7372C13.1069 29.2441 14.3586 28.7204 15.5814 28.2591C16.2711 27.9989 17.1391 27.8267 17.8478 27.5555C18.8806 27.1603 19.8787 26.7255 20.9488 26.4375C19.9382 27.0344 18.7746 27.5385 17.7498 28.1253L9.13382 33.0591C8.34533 33.5137 7.59188 34.039 6.79108 34.491L3.39758 36.4002C1.92385 37.2102 1.38833 37.3877 0 38.4274C0.204429 38.0019 0.69381 37.2158 0.947926 36.7545C1.88107 35.063 2.83454 33.3828 3.80828 31.7143C4.11232 31.1968 4.47074 30.6818 4.76322 30.1665L15.0634 12.0568C16.6037 9.39241 18.2284 6.7624 19.675 4.04542C20.0097 3.41664 20.4642 2.85277 20.7932 2.21525Z" fill="#F8F9FA"/>
+                <path d="M51.5356 0L51.6251 0.0157632C51.6284 -0.00509653 50.6337 1.58718 50.5409 1.75838C47.2551 7.70727 43.9083 13.6223 40.5013 19.5023C39.8761 20.5918 39.32 21.75 38.6777 22.8224C37.8266 24.0933 37.1549 25.4642 36.372 26.7642C35.6601 27.947 35.0893 29.1287 34.4371 30.3251C33.6669 31.7366 32.6779 32.9735 31.9983 34.4685C31.6927 35.1408 31.121 35.9416 30.7554 36.6306C30.2744 35.6818 29.3865 34.911 28.8059 34.0636C27.303 31.8701 25.5894 29.7821 24.0182 27.6475L22.3146 25.2904C22.0565 24.929 21.8127 24.5337 21.5401 24.1901C20.3706 24.5783 19.681 25.0469 18.6247 25.4733C17.8456 25.7803 17.0628 26.0779 16.2765 26.366C15.7749 26.5465 15.2178 26.7193 14.738 26.9363C15.3965 26.0763 15.6951 25.3374 16.2377 24.4411C17.3127 22.6653 18.3618 20.9473 19.3485 19.1202C19.9119 18.1062 21.113 16.4093 21.4462 15.51C21.8952 16.319 22.4878 17.0086 23.0625 17.7314C24.6174 19.6871 26.0267 21.7452 27.5814 23.6983C27.9699 24.1863 28.303 24.7343 28.695 25.2217C29.1949 25.8432 29.7371 26.4399 30.2722 27.0301C30.5746 26.5782 30.9055 25.9596 31.1807 25.4793C31.7681 24.4684 32.3417 23.4497 32.901 22.4232C33.746 20.9065 34.7502 19.4433 35.5388 17.8796C35.8282 17.3058 36.2559 16.7461 36.5524 16.1648C37.0801 14.9992 37.8247 13.9653 38.4419 12.8693C39.312 11.324 40.2953 9.64636 41.0564 8.05924C40.7576 8.21365 40.4591 8.32913 40.1409 8.43452C37.7271 9.23343 35.3143 10.0635 32.9323 10.952C32.2256 11.2157 31.5416 11.5765 30.8212 11.8131C32.1816 10.9267 33.4945 10.2959 34.87 9.50531L42.6389 5.01563C43.3172 4.63135 43.9623 4.15765 44.6411 3.78313C46.1539 2.94773 47.6696 2.12945 49.1626 1.25607C49.8967 0.826618 50.7711 0.356231 51.5356 0Z" fill="#F8F9FA"/>
+              </svg>
+            </div>
+            <nav class="nav-links">
+              <a href="#">Neora X1</a>
+              <a href="#">Configure</a>
+              <a href="#">Technology</a>
+              <a href="#">Mission</a>
+            </nav>
+          </div>
+          <div class="nav-cta-wrap">
+            <button class="nav-cta" type="button">Book a Test Drive</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- SECTION 1 content (headline only — bottom bar is fixed, outside .design) -->
+      <div class="s1" id="s1">
+        <h1 class="headline">
+          <strong>The future has <em>Arrived.</em></strong><br>
+          <strong>Drive it Today</strong>
+        </h1>
+      </div>
+
+      <!-- SECTION 2 title -->
+      <div class="s2-title" id="s2title">
+        <h2 class="s2-h">Neora <em>X1</em></h2>
+        <p class="s2-sub">Built for those who demand performance without compromise.</p>
+      </div>
+
+      <!-- metric cards — inside .design, pinned to bottom -->
+      <div class="metrics" id="metrics">
+        <div class="card" data-card-index="0">
+          <p class="m-val"><span class="m-num">820</span><span class="m-unit"> km</span></p>
+          <p class="m-label">Maximum driving range</p>
+        </div>
+        <div class="card" data-card-index="1">
+          <p class="m-val"><span class="m-num">2.9</span><span class="m-unit"> sec</span></p>
+          <p class="m-label">0–100 km/h acceleration</p>
+        </div>
+        <div class="card" data-card-index="2">
+          <p class="m-val"><span class="m-num">15</span><span class="m-unit"> min</span></p>
+          <p class="m-label">Charge from 20% to 80%</p>
+        </div>
+        <div class="card" data-card-index="3">
+          <p class="m-val"><span class="m-num">1,200</span><span class="m-unit"> hp</span></p>
+          <p class="m-label">Dual-motor performance system</p>
+        </div>
+      </div>
+
+    </div><!-- /design -->
+  </div><!-- /stage -->
+</main>
+
+<!-- s1-bottom: FIXED outside .design so it scales independently -->
+<div class="s1-bottom" id="s1Bottom">
+  <div class="s1-bottom-inner" id="s1BottomInner">
+    <div class="s1-left">
+      <p class="s1-model">Neora <em>X</em><span style="font-size:.81em">1</span></p>
+      <p class="s1-desc">— our most advanced electric vehicle ever</p>
+    </div>
+    <div class="s1-right">
+      <button class="btn btn-primary" type="button">Book a Test Drive</button>
+      <button class="btn btn-ghost" type="button">Explore Neora X1</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION 3 — Find your Perfect Match
+     ============================================================ -->
+<section class="s3-section" id="s3">
+  <div class="s3-design" id="s3Design">
+
+    <!-- header text -->
+    <div class="s3-header">
+      <h2 class="s3-title">Find your <em>Perfect Match</em></h2>
+      <p class="s3-subtitle">Explore our complete lineup in 360°. Rotate, customize, and compare every model.</p>
+    </div>
+
+    <!-- left config panel -->
+    <div class="s3-left-wrap">
+
+      <!-- config tabs -->
+      <div class="s3-config-tabs" role="tablist">
+        <button class="s3-config-tab active" data-config="colour">Colour</button>
+        <button class="s3-config-tab" data-config="interior">Interior</button>
+        <button class="s3-config-tab" data-config="engine">Engine</button>
+        <button class="s3-config-tab" data-config="wheels">Wheels</button>
+      </div>
+
+      <!-- config card -->
+      <div class="s3-config-panel">
+        <div>
+          <div class="s3-swatches" id="s3Swatches">
+            <div class="s3-swatch selected" data-color="Phantom Black" tabindex="0" role="button">
+              <div class="s3-swatch-inner" style="background:#0a0a0a;"></div>
+              <div class="s3-swatch-border"></div>
+            </div>
+            <div class="s3-swatch" data-color="Titanium White" tabindex="0" role="button">
+              <div class="s3-swatch-inner" style="background:#fafbff;opacity:.7;"></div>
+              <div class="s3-swatch-border"></div>
+            </div>
+            <div class="s3-swatch" data-color="Frost Platinum" tabindex="0" role="button">
+              <div class="s3-swatch-inner" style="background:#a3a5ab;opacity:.7;"></div>
+              <div class="s3-swatch-border"></div>
+            </div>
+            <div class="s3-swatch" data-color="Metallic Cherry" tabindex="0" role="button">
+              <div class="s3-swatch-inner" style="background:#cb0e17;opacity:.7;"></div>
+              <div class="s3-swatch-border"></div>
+            </div>
+            <div class="s3-swatch" data-color="Olive Green" tabindex="0" role="button">
+              <div class="s3-swatch-inner" style="background:#191c0d;opacity:.8;"></div>
+              <div class="s3-swatch-border"></div>
+            </div>
+            <div class="s3-swatch" data-color="Navy Blue" tabindex="0" role="button">
+              <div class="s3-swatch-inner" style="background:#070b1a;opacity:.6;"></div>
+              <div class="s3-swatch-border"></div>
+            </div>
+          </div>
+          <div class="s3-color-label">
+            <span>Color:</span><span id="s3ColorName">Phantom Black</span>
+          </div>
+        </div>
+        <div>
+          <div class="s3-divider"></div>
+          <div class="s3-total-row">
+            <span class="s3-total-label">Total:</span>
+            <div class="s3-total-price"><span>€</span><span>300 000</span></div>
+          </div>
+        </div>
+        <button class="s3-reserve-btn" type="button">
+          Reserve this configuration
+          <span class="s3-arrow-icon" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- right: car image -->
+    <div class="s3-right-wrap" id="s3CarWrap">
+      <img class="s3-car-img" id="carX1" data-model="x1" src="Neora_X1.png" alt="Neora X1"/>
+      <img class="s3-car-img visible" id="carS1" data-model="s1" src="Neora_S1.png" alt="Neora S1"/>
+      <img class="s3-car-img" id="carC1" data-model="c1" src="Neora_C1.png" alt="Neora C1"/>
+    </div>
+
+    <!-- model tabs (positioned like Figma: center-right) -->
+    <div class="s3-model-tabs" role="tablist">
+      <button class="s3-model-tab" data-model="x1">Neora X1</button>
+      <button class="s3-model-tab active" data-model="s1">Neora S1</button>
+      <button class="s3-model-tab" data-model="c1">Neora C1</button>
+    </div>
+
+    <!-- glow ellipse -->
+    <svg class="s3-glow" viewBox="0 0 1141 138" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <ellipse cx="570.5" cy="69" rx="570.5" ry="69" fill="white" fill-opacity="0.15"/>
+    </svg>
+    <div class="s3-360">360°</div>
+
+  </div><!-- /s3-design -->
+</section>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ── video config ─────────────────────────────────────────── */
+  var SOURCES = [
+    "./neora-video.mp4",
+    "https://raw.githubusercontent.com/Vkadema/Website_Design_Neora/main/neora-video.mp4"
+  ];
+  var VIDEO_DUR  = 9.938;   // total duration
+  var FREEZE     = 7.9;     // intro auto-play stops here (section-1 reveal)
+
+  /* blackout: start fading in 3s before end, finish at end */
+  var BLK_START  = VIDEO_DUR - 3.0;  // 6.938s
+  var BLK_END    = VIDEO_DUR;        // 9.938s
+
+  /* nav: appear 1.5s before end of video */
+  var NAV_START  = VIDEO_DUR - 1.5;  // 8.438s
+  var NAV_END    = VIDEO_DUR;        // 9.938s
+
+  var END_SAFE   = 9.93;    // last safe frame to seek to
+  var SCRUB_END_P= 0.60;    // scroll progress where scrub reaches last frame
+
+  var REVEAL_MS  = 700;     // s1-bottom fade-in after freeze
+
+  /* section-2 title appears as scroll approaches SCRUB_END_P */
+  var TITLE_IN   = [0.58, 0.70];
+
+  var reduce = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+  /* ── DOM refs ─────────────────────────────────────────────── */
+  var V        = document.getElementById("video");
+  var track    = document.getElementById("track");
+  var design   = document.getElementById("design");
+  var nav      = document.getElementById("nav");
+  var blackout = document.getElementById("blackout");
+  var s1       = document.getElementById("s1");
+  var s1Bottom = document.getElementById("s1Bottom");
+  var s1Inner  = document.getElementById("s1BottomInner");
+  var s2title  = document.getElementById("s2title");
+  var cards    = Array.prototype.slice.call(document.querySelectorAll(".card"));
+
+  var phase       = "intro";
+  var revealStart = 0;
+  var lastSeek    = -1;
+  var si          = 0;
+
+  /* ── helpers ──────────────────────────────────────────────── */
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function smoothstep(a,b,x){
+    x=clamp((x-a)/(b-a),0,1); return x*x*(3-2*x);
+  }
+  function lerp(a,b,t){ return a+(b-a)*t; }
+
+  /* scale the 1920-wide design surface + the fixed s1-bottom bar */
+  function fit(){
+    var s = window.innerWidth/1920;
+    design.style.setProperty("--scale", s);
+    document.documentElement.style.setProperty("--scale", s);
+    /* also scale s3 design surface */
+    var s3d = document.getElementById("s3Design");
+    if(s3d){
+      s3d.style.transform = "scale("+s+")";
+      /* set wrapper height so it takes correct vertical space */
+      s3d.parentElement.style.height = (1034*s)+"px";
+    }
+    /* fix: s1-bottom is fixed so we need to centre the scaled inner */
+    s1Inner.style.transform = "scale("+s+")";
+    /* adjust left so the scaled 1920-wide bar is left-aligned at 0 */
+    s1Inner.style.transformOrigin = "bottom left";
+  }
+  fit();
+  window.addEventListener("resize", fit, {passive:true});
+
+  /* scroll progress through .track (0 → 1) */
+  function getP(){
+    var r = track.getBoundingClientRect();
+    var total = track.offsetHeight - window.innerHeight;
+    if(total<=0) return 0;
+    return clamp(-r.top/total, 0, 1);
+  }
+
+  /* ── video source fallback ────────────────────────────────── */
+  function applySrc(){ V.src = SOURCES[si]; }
+  V.addEventListener("error", function(){
+    if(si < SOURCES.length-1){
+      si++; applySrc(); V.load();
+      if(phase==="intro"&&!reduce){ var p=V.play(); if(p&&p.catch) p.catch(function(){}); }
+    }
+  });
+  applySrc();
+
+  function freezeNow(now){
+    phase="post";
+    try{ V.pause(); }catch(e){}
+    try{ V.currentTime=FREEZE; }catch(e){}
+    revealStart=now;
+  }
+
+  function startIntro(){
+    if(reduce){ freezeNow(performance.now()); return; }
+    var p=V.play();
+    if(p&&p.catch){ p.catch(function(){ freezeNow(performance.now()); }); }
+  }
+
+  /* listen for the video time to drive blackout & nav during intro */
+  V.addEventListener("timeupdate", function(){
+    if(phase!=="intro") return;
+    var t = V.currentTime;
+
+    /* blackout: fade in from BLK_START to BLK_END */
+    var blkF = reduce ? 0 : smoothstep(BLK_START, BLK_END, t);
+    blackout.style.setProperty("--blk-a", blkF.toFixed(3));
+
+    /* nav: fade in from NAV_START to NAV_END */
+    var navF = reduce ? 0 : smoothstep(NAV_START, NAV_END, t);
+    nav.style.opacity = navF;
+
+    /* s1 bottom bar: appears after freeze (driven separately in rAF) */
+  });
+
+  if(V.readyState>=2){ startIntro(); }
+  else { V.addEventListener("loadeddata", startIntro, {once:true}); }
+
+  /* ── main rAF loop ────────────────────────────────────────── */
+  function frame(now){
+    var p = getP();
+
+    /* intro: detect freeze point or early scroll */
+    if(phase==="intro"){
+      if(reduce){ freezeNow(now); }
+      else if(V.currentTime >= FREEZE-0.012){ freezeNow(now); }
+      else if(p > 0.002){ freezeNow(now); }
+    }
+
+    /* introF: 0 → 1 after freeze (drives s1-bottom, s1 opacity) */
+    var introF = (phase==="intro") ? 0
+      : (reduce ? 1 : smoothstep(0, 1, clamp((now-revealStart)/REVEAL_MS, 0, 1)));
+
+    /* ── SECTION 1 ── */
+    /* headline fades out as user scrolls */
+    var s1Fade  = smoothstep(0.0, 0.14, p);
+    var s1op    = introF * (1-s1Fade);
+    s1.style.opacity      = s1op;
+    s1.style.pointerEvents= s1op>0.05 ? "auto" : "none";
+
+    /* s1-bottom: same opacity as s1, but it's a fixed element */
+    s1Bottom.style.opacity      = s1op;
+    s1Bottom.style.pointerEvents= s1op>0.05 ? "auto" : "none";
+
+    /* ── BLACKOUT (post-freeze, driven by scroll position) ── */
+    if(phase==="post"){
+      /* keep blackout at max once video freeze is done */
+      var blkPost = clamp(introF, 0, 1);
+      /* once scrolling begins the blackout stays at 1 or fades according
+         to the scroll — here we keep it at 1 to maintain dark overlay on s2 */
+      blackout.style.setProperty("--blk-a", blkPost.toFixed(3));
+      nav.style.opacity = blkPost;
+    }
+
+    /* ── SECTION 2 title ── */
+    var tF = reduce ? (p>TITLE_IN[0]?1:0) : smoothstep(TITLE_IN[0], TITLE_IN[1], p);
+    s2title.style.opacity    = tF;
+    s2title.style.transform  = "translateY("+((1-tF)*24).toFixed(2)+"px)";
+    s2title.style.pointerEvents = tF>0.05?"auto":"none";
+
+    /* ── SCRUB ── */
+    if(phase==="post"){
+      var sp = clamp(p/SCRUB_END_P, 0, 1);
+      var t  = FREEZE + sp*(END_SAFE-FREEZE);
+      if(Math.abs(t-lastSeek)>0.008){
+        try{ V.currentTime=t; lastSeek=t; }catch(e){}
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* ── metric cards: IntersectionObserver, left→right stagger ── */
+  (function(){
+    var observed = false;
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting && !observed){
+          observed = true;
+          cards.forEach(function(card, i){
+            setTimeout(function(){
+              card.classList.add("revealed");
+            }, i * 120);
+          });
+          io.disconnect();
+        }
+      });
+    },{threshold:0.25});
+    /* observe the metrics container */
+    var metricsEl = document.getElementById("metrics");
+    if(metricsEl) io.observe(metricsEl);
+  })();
+
+  /* ── SECTION 3 interactions ─────────────────────────────── */
+
+  /* model tab switch */
+  var modelTabs = Array.prototype.slice.call(document.querySelectorAll(".s3-model-tab"));
+  var carImgs   = Array.prototype.slice.call(document.querySelectorAll(".s3-car-img"));
+  function switchModel(key){
+    modelTabs.forEach(function(t){
+      var a = t.getAttribute("data-model")===key;
+      t.classList.toggle("active",a);
+      t.setAttribute("aria-selected",a?"true":"false");
+    });
+    carImgs.forEach(function(img){
+      img.classList.toggle("visible", img.getAttribute("data-model")===key);
+    });
+  }
+  modelTabs.forEach(function(t){
+    t.addEventListener("click",function(){ switchModel(t.getAttribute("data-model")); });
+  });
+
+  /* config tab switch */
+  var configTabs = Array.prototype.slice.call(document.querySelectorAll(".s3-config-tab"));
+  configTabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      configTabs.forEach(function(x){
+        x.classList.toggle("active",x===t);
+        x.setAttribute("aria-selected",x===t?"true":"false");
+      });
+    });
+  });
+
+  /* colour swatches */
+  var swatches  = Array.prototype.slice.call(document.querySelectorAll(".s3-swatch"));
+  var colorName = document.getElementById("s3ColorName");
+  swatches.forEach(function(sw){
+    function pick(){
+      swatches.forEach(function(s){ s.classList.remove("selected"); });
+      sw.classList.add("selected");
+      colorName.textContent = sw.getAttribute("data-color");
+    }
+    sw.addEventListener("click",pick);
+    sw.addEventListener("keydown",function(e){
+      if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(); }
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
