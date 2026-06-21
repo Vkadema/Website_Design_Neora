@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Neora X1 — The future has arrived</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zalando+Sans:wght@400;500;600&family=Zalando+Sans+Expanded:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* ---- Figma color tokens ---- */
+  --white-1:#F8F9FA;   /* White 1st */
+  --white-2:#E3E4E5;   /* White 2nd */
+  --gray:#8A898A;      /* Gray */
+  --black:#02050D;     /* Black (page) */
+  --ink:#08090A;       /* Figma Black token (on-light text) */
+  --blackout:#1F1D1D;  /* blackout gradient */
+  --nav-bg:rgba(28,28,31,.5);
+  --btn-light:#F8F9FA;
+  --btn-ghost:rgba(40,40,40,.25);
+  --card-bg:rgba(40,40,40,.25);
+  --panel-bg:rgba(40,40,40,.25);
+  --pill-shadow:0 4px 4px rgba(20,19,21,.3);
+  /* ---- type ---- */
+  --exp:"Zalando Sans Expanded","Zalando Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --sans:"Zalando Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--black);color:var(--white-1);}
+body{font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+img,svg{display:block;}
+
+/* ====== scroll structure ====== */
+/* .track is tall; the .stage sticks while the page scrolls through it.
+   Total scrub distance = (track height − 100vh). */
+.track{position:relative;height:380vh;}                 /* 100vh hero + scrub + reveal/hold */
+.stage{position:sticky;top:0;height:100vh;width:100%;overflow:hidden;background:var(--black);}
+
+/* full-bleed video behind everything */
+.bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;background:var(--black);z-index:0;}
+
+/* ====== blackout group (3 stacked overlay gradients + subtle blur) ======
+   No z-index / opacity here on purpose: the container must NOT form a
+   stacking context, otherwise mix-blend can't reach the video painted below
+   it in .stage. The darkening is faded via the gradient alpha (--blk-a). */
+.blackout{position:absolute;inset:0;pointer-events:none;}
+.blk-grad{position:absolute;left:0;top:-2.78vh;width:100%;height:61.1vh;
+  background:linear-gradient(180deg,rgba(31,29,29,var(--blk-a,0)) 0%,rgba(31,29,29,0) 100%);
+  mix-blend-mode:overlay;}
+/* один із верхніх шарів — звичайний blend: робить верх (за хедером) щільнішим */
+.blk-grad.is-solid{mix-blend-mode:normal;}
+/* нижній віньєт: темніше знизу вгору, overlay, ~70% — для читабельності нижнього блоку */
+.blk-grad-bottom{position:absolute;left:0;bottom:0;width:100%;height:35.6vh;
+  background:linear-gradient(0deg,rgba(31,29,29,calc(var(--blk-a,0) * .7)) 0%,rgba(31,29,29,0) 100%);
+  mix-blend-mode:overlay;}
+.blk-blur{position:absolute;left:0;top:0;width:100%;height:38.2vh;
+  background:rgba(31,29,29,.01);backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px);}
+
+/* ====== top-anchored design surface: 1920×1080 frame scaled to width ====== */
+.design{position:absolute;left:0;top:0;width:1920px;height:1080px;
+  transform-origin:top left;transform:scale(var(--scale,1));z-index:2;}
+
+/* ---------- header (fixed to top across the whole page) ---------- */
+.nav-fixed{position:fixed;top:0;left:0;width:1920px;transform-origin:top left;transform:scale(var(--scale,1));
+  z-index:50;pointer-events:none;}
+.nav{position:relative;width:1920px;padding:24px 40px;pointer-events:none;
+  transition:transform .42s cubic-bezier(.4,0,.2,1);will-change:transform;}
+.nav.is-hidden{transform:translateY(-140px);}
+/* reveal-маску тримаємо на самій плашці: маска і backdrop-filter уживаються на
+   одному елементі, а маска чи opacity на ПРЕДКУ .nav глушили б блюр скла. */
+.nav-pill{display:flex;align-items:center;justify-content:space-between;width:100%;pointer-events:auto;
+  padding:12px 12px 12px 44px;border-radius:200px;background:var(--nav-bg);
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 calc(var(--nav-rev,0%) - 16%),transparent var(--nav-rev,0%));
+          mask-image:linear-gradient(to bottom,#000 0%,#000 calc(var(--nav-rev,0%) - 16%),transparent var(--nav-rev,0%));}
+.nav-left{display:flex;align-items:center;gap:44px;min-width:0;}
+.nav-logo{display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+.nav-logo svg{width:51.625px;height:38.427px;}
+.nav-links{display:flex;gap:40px;align-items:center;min-width:0;
+  font-family:var(--exp);font-weight:500;font-size:18px;line-height:1.12;color:var(--white-1);white-space:nowrap;}
+.nav-links a{color:inherit;text-decoration:none;opacity:.8;}
+.nav-cta-wrap{display:flex;align-items:center;justify-content:flex-end;gap:28px;}
+.nav-phone{display:flex;align-items:center;gap:10px;font-family:var(--exp);font-weight:500;font-size:18px;line-height:1.12;color:var(--white-1);text-decoration:none;white-space:nowrap;}
+.nav-phone svg{width:22px;height:22px;flex:0 0 auto;}
+.nav-cta{display:flex;align-items:center;justify-content:center;padding:16px 32px;border:0;cursor:pointer;
+  border-radius:200px;background:var(--btn-light);
+  font-family:var(--exp);font-weight:600;font-size:18px;line-height:1.12;color:var(--ink);white-space:nowrap;}
+
+/* ---------- section 1: headline (top-anchored, lives in .design) ---------- */
+.s1-top{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;will-change:opacity,transform;}
+.headline{position:absolute;left:0;top:174.55px;width:1920px;margin:0;text-align:center;
+  font-family:var(--exp);font-size:90px;line-height:1.05;letter-spacing:-.9px;color:var(--white-1);}
+.headline .grad{font-weight:600;
+  background:linear-gradient(180deg,#ffffff 0%,#dcdcdc 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;}
+.headline .ital{font-weight:500;font-style:italic;color:var(--gray);}
+
+/* ---------- section 1: bottom block (always 100px from the screen bottom) ---------- */
+.s1-bottom-scale{position:absolute;left:0;bottom:100px;width:1920px;
+  transform-origin:bottom left;transform:scale(var(--scale,1));z-index:2;}
+.s1-bottom{padding:0 80px;display:flex;align-items:flex-end;justify-content:space-between;gap:40px;
+  opacity:0;will-change:opacity,transform;}
+.s1-left{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:14px;align-items:flex-start;}
+.s1-meet{margin:0;font-family:var(--exp);font-weight:600;font-size:48px;line-height:.92;color:var(--white-1);white-space:nowrap;}
+.s1-meet .x1{font-weight:700;font-style:italic;}
+.s1-desc{margin:0;width:306px;max-width:100%;font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.3;color:var(--white-2);}
+.s1-actions{display:flex;gap:20px;align-items:center;flex:0 0 auto;}
+.s1-btn{display:flex;align-items:center;justify-content:center;gap:16px;width:312px;padding:20px 32px;border:0;cursor:pointer;
+  border-radius:200px;font-family:var(--exp);font-weight:600;font-size:20px;line-height:1.12;color:var(--white-1);white-space:nowrap;
+  backdrop-filter:blur(13px) saturate(1.4);-webkit-backdrop-filter:blur(13px) saturate(1.4);}
+.s1-btn-ghost{background:rgba(255,255,255,.05);}
+.s1-btn-fill{background:rgba(255,255,255,.25);}
+.s1-btn svg{width:24px;height:auto;flex:0 0 auto;}
+.s1-preview{flex:1 1 0;min-width:0;display:flex;justify-content:flex-end;align-items:flex-end;}
+.s1-preview-card{padding:6px;border-radius:28px;background:rgba(40,40,40,.25);
+  backdrop-filter:blur(13px) saturate(1.4);-webkit-backdrop-filter:blur(13px) saturate(1.4);}
+.s1-preview-inner{position:relative;width:310px;height:180px;border-radius:22px;overflow:hidden;background:#0c0f13;}
+.s1-preview-inner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.s1-preview-inner.is-empty img{display:none;}
+.s1-preview-inner.is-empty::after{content:attr(data-img);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:0 10px;font-family:var(--exp);font-weight:500;font-size:13px;color:rgba(248,249,250,.25);}
+.s1-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:55px;height:55px;border:0;cursor:pointer;padding:0;
+  border-radius:50%;background:rgba(248,249,250,.2);display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+.s1-play svg{width:18px;height:18px;margin-left:2px;}
+
+/* ---------- section 2 ---------- */
+.s2-title{position:absolute;left:80px;top:160px;z-index:2;display:flex;flex-direction:column;gap:12px;
+  opacity:0;will-change:opacity,transform;}
+.s2-h{margin:0;font-family:var(--exp);font-weight:600;font-size:60px;line-height:1.12;letter-spacing:-.6px;color:var(--white-1);}
+.s2-h .ital{font-weight:500;font-style:italic;color:var(--gray);}
+.s2-right{position:absolute;right:80px;top:160px;width:412px;z-index:2;display:flex;flex-direction:column;gap:12px;
+  opacity:0;will-change:opacity,transform;}
+.s2-right-h{margin:0;font-family:var(--exp);font-weight:600;font-size:22px;line-height:1.2;color:var(--white-1);}
+.s2-right-p{margin:0;font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.3;color:var(--gray);}
+
+/* metric cards: bottom-anchored so they stay visible at any resolution */
+.metrics{position:absolute;left:0;bottom:100px;width:1920px;
+  transform-origin:bottom left;transform:scale(var(--scale,1));padding:0 80px;z-index:2;
+  display:flex;align-items:center;gap:24px;}
+.card{flex:1 0 0;min-width:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;
+  padding:28px 38px;border-radius:24px;background:var(--card-bg);opacity:0;will-change:opacity,transform;}
+.m-val{margin:0;font-family:var(--exp);font-weight:600;font-size:40px;line-height:1.12;color:var(--white-1);white-space:nowrap;}
+.m-label{margin:0;font-family:var(--sans);font-weight:400;font-size:18px;line-height:1.12;color:var(--white-2);white-space:nowrap;}
+
+/* ====== section 3: Find your Perfect Match (Neora S1 configurator) ====== */
+.s3{position:relative;width:100%;height:calc(var(--scale,1) * 1034px);background:var(--black);overflow:hidden;}
+.s3-design{position:absolute;left:0;top:0;width:1920px;height:1034px;transform-origin:top left;transform:scale(var(--scale,1));}
+
+.s3-glow{position:absolute;left:504px;top:231px;width:1526px;height:852px;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 50% 50% at 50% 48%, rgba(122,126,142,.22) 0%, rgba(122,126,142,.06) 45%, rgba(0,0,0,0) 70%);}
+.s3-platform{position:absolute;left:704px;top:792px;width:1141px;height:130px;z-index:1;border-radius:50%;
+  background:radial-gradient(ellipse 50% 50% at 50% 50%, rgba(248,249,250,.05) 0%, rgba(0,0,0,0) 68%);
+  box-shadow:inset 0 -1px 0 rgba(248,249,250,.06);}
+/* Car container matches the exported render node bounds (Figma "neora-s1", 1416x802.5).
+   Images are exported at @2x — object-fit + fixed design-px box renders them at the
+   intended 1x size automatically, so any @2x asset just looks sharper, never bigger/smaller. */
+.s3-car{position:absolute;left:504px;top:231.5px;width:1416px;height:802.5px;z-index:2;}
+.s3-car-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;
+  opacity:0;transition:opacity .45s ease;will-change:opacity;}
+.s3-car.is-empty::after{content:attr(data-missing);position:absolute;left:186px;top:192px;width:1170px;height:530px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--exp);font-weight:500;font-size:30px;color:rgba(248,249,250,.22);
+  border:1px dashed rgba(248,249,250,.12);border-radius:24px;}
+.s3-360{position:absolute;left:1251px;top:931px;z-index:2;font-family:var(--sans);font-weight:400;font-size:18px;color:rgba(138,137,138,.7);}
+
+.s3-title{position:absolute;left:543.5px;top:89px;width:833px;z-index:3;
+  display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;}
+.s3-h{margin:0;font-family:var(--exp);font-weight:600;font-size:60px;line-height:1.12;color:var(--white-1);white-space:nowrap;}
+.s3-h .ital{font-weight:500;font-style:italic;color:var(--gray);}
+.s3-sub{margin:0;width:100%;font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.28;color:var(--gray);}
+
+.s3-models{position:absolute;left:1021px;top:318px;z-index:3;
+  display:flex;align-items:center;gap:8px;background:rgba(40,40,40,.25);padding:6px;border-radius:63px;}
+.s3-model{width:160px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:60px;cursor:pointer;
+  font-family:var(--exp);font-weight:500;font-size:18px;color:var(--white-1);opacity:.8;white-space:nowrap;}
+.s3-model.active{background:var(--white-1);color:var(--ink);font-weight:600;}
+
+.s3-config{position:absolute;left:70px;top:318px;width:480px;z-index:3;display:flex;flex-direction:column;gap:14px;}
+.s3-tabs{display:flex;align-items:center;background:rgba(40,40,40,.25);padding:6px;border-radius:63px;}
+.s3-tab{flex:1;min-width:0;height:40px;display:flex;align-items:center;justify-content:center;padding:0 24px;border-radius:60px;
+  font-family:var(--exp);font-weight:500;font-size:16px;color:var(--white-1);opacity:.8;white-space:nowrap;cursor:pointer;}
+.s3-tab.active{background:var(--white-1);color:var(--ink);font-weight:600;}
+
+.s3-panel{width:480px;background:var(--panel-bg);border-radius:26px;padding:24px;display:flex;flex-direction:column;gap:32px;}
+.s3-panel-top{display:flex;flex-direction:column;gap:20px;}
+.s3-swatches{display:flex;gap:10px;height:190px;}
+.s3-swatch{flex:1 0 0;min-width:0;height:100%;padding:0;border:0;border-radius:10px;background:var(--c,#0a0a0a);position:relative;cursor:pointer;}
+.s3-swatch::after{content:"";position:absolute;inset:0;border-radius:10px;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,0) 38%,rgba(0,0,0,.22) 100%);}
+.s3-swatch.selected{outline:1.5px solid var(--white-1);outline-offset:3px;}
+.s3-color{margin:0;display:flex;gap:6px;font-family:var(--sans);font-weight:500;font-size:16px;line-height:1.12;color:var(--gray);}
+.s3-panel-bottom{display:flex;flex-direction:column;gap:32px;}
+.s3-total-wrap{display:flex;flex-direction:column;gap:28px;}
+.s3-divider{height:1px;width:100%;background:rgba(248,249,250,.15);}
+.s3-total{display:flex;align-items:flex-end;justify-content:space-between;}
+.s3-total-label{font-family:var(--sans);font-weight:500;font-size:18px;line-height:1.12;color:var(--gray);}
+.s3-total-val{display:flex;align-items:center;gap:4px;font-family:var(--exp);font-weight:600;font-size:26px;line-height:1.12;color:var(--white-1);}
+.s3-reserve{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:20px 32px;border:0;cursor:pointer;
+  border-radius:200px;background:var(--white-1);font-family:var(--exp);font-weight:600;font-size:18px;line-height:1.12;color:var(--ink);}
+.s3-reserve svg{width:24px;height:auto;flex:0 0 auto;}
+
+/* ====== section 4: Technology Designed Around You (expanding cards) ====== */
+.s4{position:relative;width:100%;height:calc(var(--scale,1) * 1041px);background:var(--black);overflow:hidden;}
+.s4-design{position:absolute;left:0;top:0;width:1920px;height:1041px;transform-origin:top left;transform:scale(var(--scale,1));}
+
+.s4-title{position:absolute;left:70px;top:150px;width:1780px;z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;}
+.s4-h{margin:0;font-family:var(--exp);font-weight:600;font-size:60px;line-height:1.12;color:var(--white-1);}
+.s4-h .ital{font-weight:500;font-style:italic;color:var(--gray);}
+.s4-sub{margin:0;font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.28;color:var(--gray);}
+
+.s4-row{position:absolute;left:70px;top:466px;width:1780px;height:375px;display:flex;gap:20px;}
+.t-card{position:relative;flex:1 1 0;min-width:0;height:375px;display:flex;align-items:stretch;
+  border-radius:32px;overflow:hidden;background:rgba(255,255,255,.06);
+  transition:flex-grow .55s cubic-bezier(.4,0,.2,1);cursor:pointer;}
+.t-card:hover,.t-card.is-open{flex-grow:3.03;}
+
+/* left text panel (revealed on hover) */
+.t-panel{flex:0 0 auto;width:0;overflow:hidden;transition:width .55s cubic-bezier(.4,0,.2,1);}
+.t-card:hover .t-panel,.t-card.is-open .t-panel{width:377px;}
+.t-panel-inner{box-sizing:border-box;width:377px;padding:142px 32px 0;}
+.t-desc{margin:0;font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.32;color:var(--gray);
+  opacity:0;transition:opacity .4s ease .12s;}
+.t-card:hover .t-desc,.t-card.is-open .t-desc{opacity:1;}
+
+/* image */
+.t-media{flex:1 1 0;min-width:0;position:relative;align-self:stretch;overflow:hidden;border-radius:20px;}
+.t-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;}
+.t-dim{position:absolute;inset:0;background:rgba(8,9,10,.34);transition:opacity .5s ease;}
+.t-card:hover .t-dim,.t-card.is-open .t-dim{opacity:0;}
+.t-grad{position:absolute;left:0;right:0;bottom:0;height:90px;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(8,9,10,0) 0%,rgba(8,9,10,.85) 100%);opacity:.8;}
+.t-media.is-empty img{display:none;}
+.t-media.is-empty::before{content:attr(data-img);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:0 16px;font-family:var(--exp);font-weight:500;font-size:18px;color:rgba(248,249,250,.22);}
+
+/* card title — stays at top-left in both states, width capped to the card */
+.t-title{position:absolute;left:32px;top:54px;width:184px;margin:0;z-index:3;pointer-events:none;
+  font-family:var(--exp);font-weight:600;font-size:28px;line-height:1.2;color:var(--white-1);}
+
+/* ====== section 5: Built for a Cleaner Future ====== */
+.s5{position:relative;width:100%;height:calc(var(--scale,1) * 897px);background:var(--black);overflow:hidden;}
+.s5-design{position:absolute;left:0;top:0;width:1920px;height:897px;transform-origin:top left;transform:scale(var(--scale,1));}
+/* навколишній фон: повноширинний розмитий ліс, затемнений до чорного зверху/знизу */
+.s5-ambient{position:absolute;left:0;top:50%;transform:translateY(-50%);width:1920px;height:1108px;z-index:0;
+  filter:blur(12.5px);overflow:hidden;pointer-events:none;}
+.s5-ambient-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:bottom;}
+.s5-ambient.is-empty{filter:none;background:radial-gradient(ellipse 70% 90% at 50% 60%,#10171c 0%,#06080a 75%);}
+.s5-ambient.is-empty::after{content:attr(data-img);position:absolute;left:0;top:14%;width:100%;text-align:center;
+  font-family:var(--exp);font-weight:500;font-size:20px;color:rgba(248,249,250,.16);}
+.s5-ambient-fade{position:absolute;inset:0;
+  background:
+    linear-gradient(180deg,#08090A 0%,rgba(11,12,13,.89) 8.17%,rgba(17,18,19,.675) 21.875%,rgba(36,36,36,0) 50%),
+    linear-gradient(0deg,#08090A 0%,rgba(17,18,19,.675) 21.875%,rgba(36,36,36,0) 50%);}
+.s5-panel{position:absolute;left:70px;top:50px;width:1780px;height:797px;z-index:1;border-radius:38px;overflow:hidden;background:#0a0e12;}
+.s5-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:bottom;
+  filter:blur(4px);transform:scale(1.06);}
+.s5-panel.is-empty{background:#0a0e12;}
+.s5-panel.is-empty::after{content:attr(data-img);position:absolute;right:24px;top:24px;width:932px;height:749px;
+  display:flex;align-items:center;justify-content:center;border:1px dashed rgba(248,249,250,.14);border-radius:24px;
+  font-family:var(--exp);font-weight:500;font-size:22px;color:rgba(248,249,250,.2);}
+.s5-card{position:absolute;left:0;top:0;width:800px;height:100%;z-index:2;
+  display:flex;flex-direction:column;gap:64px;padding:60px 64px;border-radius:38px 0 0 38px;
+  background-image:linear-gradient(90deg,rgba(40,40,40,.25),rgba(40,40,40,.25)),linear-gradient(270deg,rgba(255,255,255,0),rgba(255,255,255,.05));
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+.s5-main{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:36px;}
+.s5-head{display:flex;flex-direction:column;gap:20px;}
+.s5-h{margin:0;width:540px;max-width:100%;font-family:var(--exp);font-weight:600;font-size:60px;line-height:1.12;color:var(--white-1);}
+.s5-h .ital{font-weight:500;font-style:italic;}
+.s5-para{margin:0;font-family:var(--sans);font-weight:400;font-size:18px;line-height:1.38;color:var(--gray);}
+.s5-para p{margin:0 0 6px;}
+.s5-para p:last-child{margin:0;}
+.s5-stats{flex:1 1 0;min-height:0;display:flex;gap:26px;align-items:stretch;}
+.s5-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:24px;}
+.s5-stat{display:flex;flex-direction:column;gap:12px;}
+.s5-num{margin:0;font-family:var(--exp);font-weight:600;font-size:46px;line-height:1.2;color:var(--white-1);white-space:nowrap;}
+.s5-lab{display:flex;align-items:center;gap:10px;font-family:var(--sans);font-weight:400;font-size:20px;line-height:1.2;color:var(--white-2);}
+.s5-lab svg{width:24px;height:24px;flex:0 0 auto;color:var(--white-2);}
+.s5-cta{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:20px 32px;border:0;cursor:pointer;
+  border-radius:200px;background:var(--white-1);font-family:var(--exp);font-weight:600;font-size:18px;color:var(--ink);}
+.s5-cta svg{width:24px;height:auto;flex:0 0 auto;}
+
+/* ====== section 6: We have Nothing to Hide (x-ray reveal) ====== */
+.s6{position:relative;width:100%;height:calc(var(--scale,1) * 1158px);background:var(--black);overflow:hidden;}
+.s6-design{position:absolute;left:0;top:0;width:1920px;height:1158px;transform-origin:top left;transform:scale(var(--scale,1));}
+.s6-floor{position:absolute;left:319px;top:528px;width:1282px;height:200px;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(214,170,110,.10) 0%,rgba(0,0,0,0) 70%);}
+.s6-car{position:absolute;left:0;top:169px;width:1920px;height:958px;z-index:1;}
+.s6-car img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;}
+.s6-cut{z-index:1;}
+.s6-full{z-index:2;}
+/* x-ray hole follows the cursor; outside the hole the full car stays opaque */
+.s6-car.is-xray .s6-full{
+  -webkit-mask-image:radial-gradient(circle at var(--mx,-400px) var(--my,-400px),transparent 0,transparent 60px,#000 165px);
+          mask-image:radial-gradient(circle at var(--mx,-400px) var(--my,-400px),transparent 0,transparent 60px,#000 165px);}
+.s6-car .s6-hint{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:4;pointer-events:none;
+  font-family:var(--sans);font-size:15px;color:rgba(248,249,250,.4);transition:opacity .3s;}
+.s6-car.is-xray .s6-hint{opacity:0;}
+.s6-car.is-empty::after{content:attr(data-img);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font-family:var(--exp);font-weight:500;font-size:24px;color:rgba(248,249,250,.2);text-align:center;}
+.s6-car.is-empty .s6-hint{display:none;}
+
+.s6-lines{position:absolute;left:0;top:0;width:1920px;height:1158px;z-index:2;pointer-events:none;overflow:visible;}
+.s6-title{position:absolute;left:535px;top:122px;width:849px;z-index:4;
+  display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;}
+.s6-h{margin:0;font-family:var(--exp);font-weight:600;font-size:60px;line-height:1.12;color:var(--white-1);white-space:nowrap;}
+.s6-h .ital{font-weight:500;font-style:italic;color:var(--gray);}
+.s6-sub{margin:0;font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.28;color:var(--gray);}
+/* ===== glass material — shared across all glass components ===== */
+.nav-pill,.card,.s3-tabs,.s3-models,.s3-panel,.btn-ghost,.s5-card,.s6-label{
+  backdrop-filter:blur(20px) saturate(1.6) brightness(1.05);
+  -webkit-backdrop-filter:blur(20px) saturate(1.6) brightness(1.05);
+  box-shadow:
+    inset 1px 1px 1px -1px rgba(255,255,255,.45),    /* Light -45deg: top-left edge (subtle) */
+    inset -1px -1px 1px -1px rgba(255,255,255,.12),   /* faint bottom-right edge */
+    inset 1.5px 0 3px -3px rgba(140,180,255,.30),     /* Dispersion: cool left fringe */
+    inset -1.5px 0 3px -3px rgba(255,170,120,.26),    /* Dispersion: warm right fringe */
+    inset 0 0 0 1px rgba(255,255,255,.06),            /* Depth: thin rim */
+    0 8px 24px rgba(0,0,0,.30);}                      /* drop shadow */
+/* Refraction/Splay: distort the backdrop via SVG displacement (Chrome/Edge; graceful fallback elsewhere). */
+@supports (backdrop-filter:url(#glass)){
+  .nav-pill,.card,.s3-tabs,.s3-models,.s3-panel,.btn-ghost,.s5-card,.s6-label{
+    backdrop-filter:blur(13px) saturate(1.6) brightness(1.05) url(#glass);}}
+
+.s6-label{position:absolute;z-index:3;pointer-events:none;display:inline-flex;padding:6px;border-radius:63px;white-space:nowrap;
+  background:rgba(40,40,40,.22);}
+.s6-label span{display:flex;align-items:center;height:40px;padding:0 24px;border-radius:60px;
+  font-family:var(--exp);font-weight:500;font-size:18px;line-height:1.12;color:var(--white-1);opacity:.92;
+  text-shadow:0 1px 2px rgba(0,0,0,.28);}
+
+/* focus + reduced motion */
+a:focus-visible,button:focus-visible{outline:2px solid var(--white-1);outline-offset:3px;border-radius:200px;}
+.s3-swatch:focus-visible{outline:1.5px solid var(--white-1);outline-offset:3px;}
+@media (prefers-reduced-motion:reduce){.blk-grad{mix-blend-mode:normal;opacity:.6;}
+  .t-card,.t-panel,.t-desc,.t-dim{transition:none;}}
+</style>
+</head>
+<body>
+<!-- fixed top header: scales to width, reveals on intro, hides on scroll-down / shows on scroll-up -->
+<div class="nav-fixed">
+  <header class="nav" id="nav">
+    <div class="nav-pill">
+      <div class="nav-left">
+        <div class="nav-logo" aria-label="Neora">
+          <svg width="52" height="39" viewBox="0 0 52 39" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20.7932 2.21525C21.1266 2.78923 22.4841 4.51694 22.9376 5.12469L28.3511 12.4674C28.7535 13.0237 29.2935 13.5566 29.6565 14.1093C30.5967 13.5544 32.2218 13.0086 33.2657 12.5545C34.5574 11.9927 35.8746 11.6439 37.1184 10.9078C36.7083 11.8551 36.1744 12.6411 35.6923 13.5389C34.8961 15.0198 34.1136 16.4451 33.1805 17.8448C32.8177 18.3893 32.5264 19.0871 32.1815 19.6575C31.4208 20.9157 30.716 22.2039 30.0132 23.4951C27.0015 19.6398 24.0677 15.7243 21.2137 11.7508C21.0794 11.9987 20.9181 12.2393 20.7682 12.4786C18.9959 15.3074 17.4587 18.2811 15.7498 21.1511C14.6609 22.9799 13.5962 24.8615 12.5744 26.7286C11.9828 27.8095 11.1516 28.9247 10.7788 30.0778C11.1507 29.9668 11.5219 29.8532 11.8924 29.7372C13.1069 29.2441 14.3586 28.7204 15.5814 28.2591C16.2711 27.9989 17.1391 27.8267 17.8478 27.5555C18.8806 27.1603 19.8787 26.7255 20.9488 26.4375C19.9382 27.0344 18.7746 27.5385 17.7498 28.1253L9.13382 33.0591C8.34533 33.5137 7.59188 34.039 6.79108 34.491L3.39758 36.4002C1.92385 37.2102 1.38833 37.3877 0 38.4274C0.204429 38.0019 0.69381 37.2158 0.947926 36.7545C1.88107 35.063 2.83454 33.3828 3.80828 31.7143C4.11232 31.1968 4.47074 30.6818 4.76322 30.1665L15.0634 12.0568C16.6037 9.39241 18.2284 6.7624 19.675 4.04542C20.0097 3.41664 20.4642 2.85277 20.7932 2.21525Z" fill="#F8F9FA"/>
+            <path d="M51.5356 0L51.6251 0.0157632C51.6284 -0.00509653 50.6337 1.58718 50.5409 1.75838C47.2551 7.70727 43.9083 13.6223 40.5013 19.5023C39.8761 20.5918 39.32 21.75 38.6777 22.8224C37.8266 24.0933 37.1549 25.4642 36.372 26.7642C35.6601 27.947 35.0893 29.1287 34.4371 30.3251C33.6669 31.7366 32.6779 32.9735 31.9983 34.4685C31.6927 35.1408 31.121 35.9416 30.7554 36.6306C30.2744 35.6818 29.3865 34.911 28.8059 34.0636C27.303 31.8701 25.5894 29.7821 24.0182 27.6475L22.3146 25.2904C22.0565 24.929 21.8127 24.5337 21.5401 24.1901C20.3706 24.5783 19.681 25.0469 18.6247 25.4733C17.8456 25.7803 17.0628 26.0779 16.2765 26.366C15.7749 26.5465 15.2178 26.7193 14.738 26.9363C15.3965 26.0763 15.6951 25.3374 16.2377 24.4411C17.3127 22.6653 18.3618 20.9473 19.3485 19.1202C19.9119 18.1062 21.113 16.4093 21.4462 15.51C21.8952 16.319 22.4878 17.0086 23.0625 17.7314C24.6174 19.6871 26.0267 21.7452 27.5814 23.6983C27.9699 24.1863 28.303 24.7343 28.695 25.2217C29.1949 25.8432 29.7371 26.4399 30.2722 27.0301C30.5746 26.5782 30.9055 25.9596 31.1807 25.4793C31.7681 24.4684 32.3417 23.4497 32.901 22.4232C33.746 20.9065 34.7502 19.4433 35.5388 17.8796C35.8282 17.3058 36.2559 16.7461 36.5524 16.1648C37.0801 14.9992 37.8247 13.9653 38.4419 12.8693C39.312 11.324 40.2953 9.64636 41.0564 8.05924C40.7576 8.21365 40.4591 8.32913 40.1409 8.43452C37.7271 9.23343 35.3143 10.0635 32.9323 10.952C32.2256 11.2157 31.5416 11.5765 30.8212 11.8131C32.1816 10.9267 33.4945 10.2959 34.87 9.50531L42.6389 5.01563C43.3172 4.63135 43.9623 4.15765 44.6411 3.78313C46.1539 2.94773 47.6696 2.12945 49.1626 1.25607C49.8967 0.826618 50.7711 0.356231 51.5356 0Z" fill="#F8F9FA"/>
+          </svg>
+        </div>
+        <nav class="nav-links">
+          <a href="#">Neora X1</a>
+          <a href="#">Configure</a>
+          <a href="#">Technology</a>
+          <a href="#">Mission</a>
+        </nav>
+      </div>
+      <div class="nav-cta-wrap">
+        <a class="nav-phone" href="tel:18005550199">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L19 17l3 2v3a2 2 0 0 1-2.2 2A18 18 0 0 1 3 6.2 2 2 0 0 1 5 4z"/></svg>
+          1-800-555-0199
+        </a>
+        <button class="nav-cta" type="button">Book a Test Drive</button>
+      </div>
+    </div>
+  </header>
+</div>
+
+<main class="track" id="track">
+  <div class="stage" id="stage">
+    <video class="bg-video" id="video" muted playsinline preload="auto" poster="poster.jpg"></video>
+
+    <!-- blackout group -->
+    <div class="blackout" id="blackout">
+      <div class="blk-grad"></div>
+      <div class="blk-grad is-solid"></div>
+      <div class="blk-grad"></div>
+      <div class="blk-blur"></div>
+      <div class="blk-grad-bottom"></div>
+    </div>
+
+    <!-- top-anchored design surface: headline + section-2 title -->
+    <div class="design" id="design">
+      <!-- section 1 headline (top-anchored) -->
+      <div class="s1-top" id="s1top">
+        <h1 class="headline"><span class="grad">The future has </span><span class="ital">Arrived.</span><br><span class="grad">Drive it Today</span></h1>
+      </div>
+
+      <!-- section 2 title (top-anchored) -->
+      <div class="s2-title" id="s2title">
+        <h2 class="s2-h">Trusted<br>by <span class="ital">Innovators</span></h2>
+      </div>
+      <div class="s2-right" id="s2right">
+        <p class="s2-right-h">Built on Trust and Innovation</p>
+        <p class="s2-right-p">From daily drives to remarkable trips, Neora is the choice for drivers seeking innovation, reliability, and comfort.</p>
+      </div>
+    </div>
+
+    <!-- section 1 bottom block: always 100px above the screen bottom -->
+    <div class="s1-bottom-scale">
+      <div class="s1-bottom" id="s1bottom">
+        <div class="s1-left">
+          <h2 class="s1-meet">Meet<br>Neora <span class="x1">X1</span></h2>
+          <p class="s1-desc">— presenting our advanced vehicle, set to elevate performance and sustainability standards.</p>
+        </div>
+        <div class="s1-actions">
+          <button class="s1-btn s1-btn-ghost" type="button" onclick="var c=document.getElementById('configurator');if(c)c.scrollIntoView({behavior:'smooth'});">Configurator</button>
+          <button class="s1-btn s1-btn-fill" type="button">Explore Neora X1
+            <svg viewBox="0 0 24 8" fill="none" aria-hidden="true"><path d="M0 4h21.5M18.5 1l3 3-3 3" stroke="#F8F9FA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="s1-preview">
+          <div class="s1-preview-card">
+            <div class="s1-preview-inner" data-img="hero-preview.png">
+              <img src="hero-preview.png" alt="" onerror="this.closest('.s1-preview-inner').classList.add('is-empty')">
+              <button class="s1-play" type="button" aria-label="Play preview">
+                <svg viewBox="0 0 24 24" fill="#08090A" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- section 2 metrics: bottom-anchored, always visible -->
+    <div class="metrics" id="metrics">
+      <div class="card"><p class="m-val">50,000+</p><p class="m-label">Vehicles delivered</p></div>
+      <div class="card"><p class="m-val">98%</p><p class="m-label">Customer satisfaction</p></div>
+      <div class="card"><p class="m-val">25</p><p class="m-label">Countries Represented</p></div>
+      <div class="card"><p class="m-val">Top choice</p><p class="m-label">for Premium EV Enthusiasts</p></div>
+    </div>
+  </div>
+</main>
+
+<!-- ====== Section 3 — Find your Perfect Match (Neora S1 configurator) ====== -->
+<section class="s3" id="configurator">
+  <div class="s3-design">
+    <div class="s3-glow"></div>
+    <div class="s3-platform"></div>
+
+    <!-- car: single model (Neora X1) — drop neora-x1-{colour}.png into the repo -->
+    <div class="s3-car" id="s3car" data-missing="neora-x1-phantom-black.png">
+      <img class="s3-car-img" id="s3carImgA" alt="Neora X1">
+      <img class="s3-car-img" id="s3carImgB" alt="">
+    </div>
+    <div class="s3-360">360°</div>
+
+    <!-- heading -->
+    <div class="s3-title">
+      <h2 class="s3-h">Find your <span class="ital">Perfect Match</span></h2>
+      <p class="s3-sub">Explore our complete lineup in 360°. Rotate, customize, and compare every model.</p>
+    </div>
+
+    <!-- configurator -->
+    <div class="s3-config">
+      <div class="s3-tabs" id="s3tabs">
+        <div class="s3-tab active">Colour</div>
+        <div class="s3-tab">Interior</div>
+        <div class="s3-tab">Engine</div>
+        <div class="s3-tab">Wheels</div>
+      </div>
+
+      <div class="s3-panel">
+        <div class="s3-panel-top">
+          <div class="s3-swatches" id="s3swatches">
+            <button class="s3-swatch selected" type="button" style="--c:#0a0a0a" data-color="phantom-black" data-name="Phantom Black" aria-label="Phantom Black"></button>
+            <button class="s3-swatch" type="button" style="--c:#fafbff" data-color="titanium-white" data-name="Titanium White" aria-label="Titanium White"></button>
+            <button class="s3-swatch" type="button" style="--c:#a3a5ab" data-color="frost-platinum" data-name="Frost Platinum" aria-label="Frost Platinum"></button>
+            <button class="s3-swatch" type="button" style="--c:#cb0e17" data-color="metallic-cherry" data-name="Metallic Cherry" aria-label="Metallic Cherry"></button>
+            <button class="s3-swatch" type="button" style="--c:#191c0d" data-color="olive-green" data-name="Olive Green" aria-label="Olive Green"></button>
+            <button class="s3-swatch" type="button" style="--c:#070b1a" data-color="navy-blue" data-name="Navy Blue" aria-label="Navy Blue"></button>
+          </div>
+          <p class="s3-color"><span>Color:</span><span id="s3colorName">Phantom Black</span></p>
+        </div>
+
+        <div class="s3-panel-bottom">
+          <div class="s3-total-wrap">
+            <div class="s3-divider"></div>
+            <div class="s3-total">
+              <span class="s3-total-label">Total:</span>
+              <span class="s3-total-val"><span>€</span><span>300 000</span></span>
+            </div>
+          </div>
+          <button class="s3-reserve" type="button">
+            Reserve this configuration
+            <svg viewBox="0 0 24 8" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M0 4h21.5M18.5 1l3 3-3 3" stroke="#08090A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Section 4 — Technology Designed Around You (expanding cards) ====== -->
+<section class="s4">
+  <div class="s4-design">
+    <div class="s4-title">
+      <h2 class="s4-h">Technology Designed<br><span class="ital">Around You</span></h2>
+      <p class="s4-sub">Every detail is engineered to enhance performance, safety, and comfort.<br>Advanced technology works seamlessly in the background, creating an effortless driving experience.</p>
+    </div>
+
+    <div class="s4-row" id="s4row">
+      <article class="t-card" tabindex="0">
+        <div class="t-panel"><div class="t-panel-inner">
+          <p class="t-desc">Take full control of your Neora from anywhere with an intuitive mobile app. Whether you need to adjust the climate, manage charging, navigate your route, or check diagnostics, everything is just a tap away, making your driving experience more convenient and connected.</p>
+        </div></div>
+        <div class="t-media" data-img="tech-connected.png">
+          <img src="tech-connected.png" alt="" onerror="this.closest('.t-media').classList.add('is-empty')">
+          <div class="t-dim"></div><div class="t-grad"></div>
+        </div>
+        <h3 class="t-title">Connected Ecosystem</h3>
+      </article>
+
+      <article class="t-card" tabindex="0">
+        <div class="t-panel"><div class="t-panel-inner">
+          <p class="t-desc">Our advanced energy density technology leads the industry, offering impressive range and fast charging. Get up to 820 km on a single charge and enjoy 80% battery replenishment in just 15 minutes for a smooth driving experience.</p>
+        </div></div>
+        <div class="t-media" data-img="tech-battery.png">
+          <img src="tech-battery.png" alt="" onerror="this.closest('.t-media').classList.add('is-empty')">
+          <div class="t-dim"></div><div class="t-grad"></div>
+        </div>
+        <h3 class="t-title">Next-Generation Battery</h3>
+      </article>
+
+      <article class="t-card" tabindex="0">
+        <div class="t-panel"><div class="t-panel-inner">
+          <p class="t-desc">With industry-leading energy density, our technology ensures you enjoy an extended driving range and rapid charging capabilities. Travel up to 820 km on a single charge, and recharge to 80% in just 15 minutes, making long journeys and quick stops hassle-free.</p>
+        </div></div>
+        <div class="t-media" data-img="tech-driving.png">
+          <img src="tech-driving.png" alt="" onerror="this.closest('.t-media').classList.add('is-empty')">
+          <div class="t-dim"></div><div class="t-grad"></div>
+        </div>
+        <h3 class="t-title">Intelligent Driving</h3>
+      </article>
+
+      <article class="t-card" tabindex="0">
+        <div class="t-panel"><div class="t-panel-inner">
+          <p class="t-desc">Experience a sleek, minimalist design that seamlessly integrates sustainable materials with an advanced digital cockpit. This innovative cockpit is designed to blend into your environment, becoming virtually invisible when not in use, ensuring a clean and uncluttered space.</p>
+        </div></div>
+        <div class="t-media" data-img="tech-interior.png">
+          <img src="tech-interior.png" alt="" onerror="this.closest('.t-media').classList.add('is-empty')">
+          <div class="t-dim"></div><div class="t-grad"></div>
+        </div>
+        <h3 class="t-title">Premium Interior</h3>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Section 5 — Built for a Cleaner Future ====== -->
+<section class="s5">
+  <div class="s5-design">
+    <div class="s5-ambient" data-img="cleaner-future.png" aria-hidden="true">
+      <img class="s5-ambient-bg" src="cleaner-future.png" alt=""
+           onerror="this.style.display='none';this.closest('.s5-ambient').classList.add('is-empty')">
+      <div class="s5-ambient-fade"></div>
+    </div>
+    <div class="s5-panel" data-img="cleaner-future-card.png">
+      <img class="s5-bg" src="cleaner-future-card.png" alt=""
+           onerror="this.style.display='none';this.closest('.s5-panel').classList.add('is-empty')">
+      <div class="s5-card">
+        <div class="s5-main">
+          <div class="s5-head">
+            <h2 class="s5-h">Built for a <span class="ital">Cleaner Future</span></h2>
+            <div class="s5-para">
+              <p>We believe mobility should move people forward without moving the planet backward.</p>
+              <p>Creating electric vehicles isn't enough. We're building a future where innovation, sustainability, and exceptional design exist in perfect balance.</p>
+            </div>
+          </div>
+          <div class="s5-stats">
+            <div class="s5-col">
+              <div class="s5-stat">
+                <p class="s5-num">95%</p>
+                <div class="s5-lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 2.4v5.3c0 4.4-3 7.1-7 8.9-4-1.8-7-4.5-7-8.9V5.4L12 3z"/></svg><span>Safe Battery Materials</span></div>
+              </div>
+              <div class="s5-stat">
+                <p class="s5-num">0 g/km</p>
+                <div class="s5-lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12l1.6-4.2A2 2 0 0 1 7 6.5h10a2 2 0 0 1 1.9 1.3L20.5 12M3.5 12h17v3.5a.5.5 0 0 1-.5.5H4a.5.5 0 0 1-.5-.5V12zM5 16.5v1.5M19 16.5v1.5"/><circle cx="7.5" cy="14" r="1"/><circle cx="16.5" cy="14" r="1"/></svg><span>Driving Emissions</span></div>
+              </div>
+            </div>
+            <div class="s5-col">
+              <div class="s5-stat">
+                <p class="s5-num">100%</p>
+                <div class="s5-lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg><span>Renewable Production</span></div>
+              </div>
+              <div class="s5-stat">
+                <p class="s5-num">35 dB</p>
+                <div class="s5-lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13.5V12a8 8 0 0 1 16 0v1.5"/><rect x="3" y="13.5" width="4" height="6.5" rx="1.6"/><rect x="17" y="13.5" width="4" height="6.5" rx="1.6"/></svg><span>Low Noise Level</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="s5-cta" type="button" onclick="var c=document.getElementById('configurator');if(c)c.scrollIntoView({behavior:'smooth'});">Go to configurator <svg viewBox="0 0 24 8" fill="none"><path d="M0 4h21.5M18.5 1l3 3-3 3" stroke="#08090A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Section 6 — We have Nothing to Hide (x-ray reveal) ====== -->
+<section class="s6">
+  <div class="s6-design">
+    <div class="s6-floor"></div>
+
+    <div class="s6-car" id="s6car" data-img="car-full.png + car-cutted.png">
+      <img class="s6-cut" src="car-cutted.png" alt="" onerror="this.style.display='none'">
+      <img class="s6-full" src="car-full.png" alt=""
+           onerror="this.style.display='none';this.closest('.s6-car').classList.add('is-empty')">
+      <div class="s6-hint">Move your cursor over the car to x-ray it</div>
+    </div>
+
+    <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+      <filter id="glass" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.016" numOctaves="2" seed="7" result="noise"/>
+        <feGaussianBlur in="noise" stdDeviation="1.6" result="softNoise"/>
+        <feDisplacementMap in="SourceGraphic" in2="softNoise" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </svg>
+
+    <svg class="s6-lines" viewBox="0 0 1920 1158" fill="none" aria-hidden="true">
+      <g stroke="rgba(255,255,255,0.3)" stroke-width="1.5">
+        <line x1="715" y1="357" x2="943" y2="552"/>
+        <line x1="244" y1="488" x2="408" y2="569"/>
+        <line x1="1739" y1="431" x2="1567" y2="595"/>
+        <line x1="1259" y1="1002" x2="1090" y2="846"/>
+        <line x1="681" y1="1012" x2="537" y2="856"/>
+      </g>
+      <g fill="#f8f9fa">
+        <circle cx="943" cy="552" r="3.5"/>
+        <circle cx="408" cy="569" r="3.5"/>
+        <circle cx="1567" cy="595" r="3.5"/>
+        <circle cx="1090" cy="846" r="3.5"/>
+        <circle cx="537" cy="856" r="3.5"/>
+      </g>
+    </svg>
+
+    <div class="s6-label" style="left:598px;top:331px"><span>Ergonomic seats</span></div>
+    <div class="s6-label" style="left:140px;top:462px"><span>Instant Torque</span></div>
+    <div class="s6-label" style="left:1624px;top:405px"><span>Capacious trunk</span></div>
+    <div class="s6-label" style="left:1129px;top:976px"><span>Solid-State Battery</span></div>
+    <div class="s6-label" style="left:564px;top:986px"><span>22&quot; Aero Wheels</span></div>
+
+    <div class="s6-title">
+      <h2 class="s6-h">We have <span class="ital">Nothing to Hide</span></h2>
+      <p class="s6-sub">Explore our complete lineup in 360°. Rotate, customize, and compare every model.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- video source: prefer the optimized local copy, fall back to the
+     original on GitHub if the local file isn't present (e.g. in preview). ---- */
+  var SOURCES = [
+    "./neora-video.mp4",
+    "https://raw.githubusercontent.com/Vkadema/Website_Design_Neora/main/neora-video.mp4"
+  ];
+
+  /* ---- choreography constants ---- */
+  var FREEZE      = 7.9;    // intro stops here
+  var END_SAFE    = 9.96;   // last visible frame (avoid clamping past duration)
+  var SCRUB_END_P = 0.58;   // progress at which the video reaches the last frame
+  var REVEAL_MS   = 700;    // section-1 fade-in after the freeze
+  var NAV_MS      = 520;    // header mask-reveal duration (starts at the freeze)
+  var BODY_DELAY  = 200;    // text/buttons start this much after the header
+  var BLK_OUT     = [0.44, 0.58]; // blackout fades out across this scroll window
+  var TITLE_IN    = [0.58, 0.70];
+  var CARD_STARTS = [0.66, 0.71, 0.76, 0.80];
+  var CARD_WIN    = 0.09;
+
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var V       = document.getElementById("video");
+  var track   = document.getElementById("track");
+  var nav      = document.getElementById("nav");
+  var blackout = document.getElementById("blackout");
+  var s1top    = document.getElementById("s1top");
+  var s1bottom = document.getElementById("s1bottom");
+  var s2title  = document.getElementById("s2title");
+  var s2right  = document.getElementById("s2right");
+  var cards    = Array.prototype.slice.call(document.querySelectorAll(".card"));
+
+  var phase = "intro"; // "intro" -> "post"
+  var revealStart = 0;
+  var lastSeek = -1;
+  var si = 0;
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function smoothstep(a,b,x){ x = clamp((x-a)/(b-a),0,1); return x*x*(3-2*x); }
+
+  /* scale the 1920-wide design surfaces to the viewport width (shared via :root) */
+  function fit(){
+    document.documentElement.style.setProperty("--scale", (window.innerWidth/1920).toString());
+  }
+  fit();
+  window.addEventListener("resize", fit, {passive:true});
+
+  /* progress through the sticky track, 0..1 */
+  function getP(){
+    var r = track.getBoundingClientRect();
+    var total = track.offsetHeight - window.innerHeight;
+    if(total <= 0) return 0;
+    return clamp(-r.top/total, 0, 1);
+  }
+
+  function freezeNow(now){
+    phase = "post";
+    try{ V.pause(); }catch(e){}
+    V.playbackRate = 1;
+    try{ V.currentTime = FREEZE; }catch(e){}
+    revealStart = now;
+  }
+
+  /* video source handling with graceful fallback */
+  function applySrc(){ V.src = SOURCES[si]; }
+  V.addEventListener("error", function(){
+    if(si < SOURCES.length - 1){
+      si++;
+      applySrc();
+      V.load();
+      if(phase === "intro" && !reduce){ var p = V.play(); if(p && p.catch) p.catch(function(){}); }
+    }
+  });
+  applySrc();
+
+  function startIntro(){
+    if(reduce){ freezeNow(performance.now()); return; }
+    var p = V.play();
+    if(p && p.catch){ p.catch(function(){ freezeNow(performance.now()); }); }
+  }
+  if(V.readyState >= 2){ startIntro(); }
+  else { V.addEventListener("loadeddata", startIntro, {once:true}); }
+
+  /* safety: if nothing has played after a moment, reveal anyway */
+  setTimeout(function(){ if(phase === "intro" && (V.paused || V.currentTime === 0) && reduce === false && V.readyState < 2){ /* wait for fallback */ } }, 3000);
+
+  function frame(now){
+    var p = getP();
+
+    if(phase === "intro"){
+      if(reduce){ freezeNow(now); }
+      else {
+        if(V.currentTime >= FREEZE - 0.012){ freezeNow(now); }   // full speed, then a clean stop
+        else if(p > 0.002){ freezeNow(now); }                    // user scrolled during intro -> skip ahead
+      }
+    }
+
+    var since = (phase === "post") ? (now - revealStart) : 0;
+    // header reveals first; text/buttons follow slightly later
+    var navF  = (phase === "post") ? (reduce ? 1 : smoothstep(0,1, clamp(since/NAV_MS,0,1))) : 0;
+    var bodyF = (phase === "post") ? (reduce ? 1 : smoothstep(0,1, clamp((since-BODY_DELAY)/REVEAL_MS,0,1))) : 0;
+
+    // header intro: mask reveal (top -> bottom) on the pill itself.
+    // No opacity on .nav: opacity<1 on the ancestor would mute the pill's glass blur.
+    nav.style.setProperty("--nav-rev", (navF*116).toFixed(1) + "%");
+
+    // blackout: fades in with the header, then fades OUT as we reach section 2
+    var blkFade = smoothstep(BLK_OUT[0], BLK_OUT[1], p);
+    blackout.style.setProperty("--blk-a", (navF * (1 - blkFade)).toFixed(3));
+
+    // section 1 text + buttons: fade+rise IN on reveal, then SCROLL UP off the page as you
+    // scroll (no exit fade). Both blocks share one translateY → rigid, like the page scrolling:
+    // the top headline leaves first, the bottom block (buttons) leaves last.
+    var s1Exit = clamp(p / 0.22, 0, 1);                 // 0..1 across the first 22% of the track
+    var s1ExitPx = s1Exit * 1180;                        // slide-up distance (design px, ~one screen)
+    var s1op = bodyF;                                    // entrance fade-in only; no fade-out
+    var s1ty = "translateY(" + ((1-bodyF)*16 - s1ExitPx).toFixed(2) + "px)";
+    s1top.style.opacity = s1op.toFixed(3);
+    s1top.style.transform = s1ty;
+    s1bottom.style.opacity = s1op.toFixed(3);
+    s1bottom.style.transform = s1ty;
+    s1bottom.style.pointerEvents = (s1op > 0.05 && s1Exit < 0.95) ? "auto" : "none";
+
+    // section 2 title
+    var tF = reduce ? (p > TITLE_IN[0] ? 1 : 0) : smoothstep(TITLE_IN[0], TITLE_IN[1], p);
+    s2title.style.opacity = tF;
+    s2title.style.transform = "translateY(" + ((1-tF)*24).toFixed(2) + "px)";
+    s2title.style.pointerEvents = tF > 0.05 ? "auto" : "none";
+    if(s2right){
+      s2right.style.opacity = tF;
+      s2right.style.transform = "translateY(" + ((1-tF)*24).toFixed(2) + "px)";
+      s2right.style.pointerEvents = tF > 0.05 ? "auto" : "none";
+    }
+
+    // metric cards: one after another, left -> right
+    for(var i=0;i<cards.length;i++){
+      var f = reduce ? (p > CARD_STARTS[i] ? 1 : 0)
+                     : smoothstep(CARD_STARTS[i], CARD_STARTS[i]+CARD_WIN, p);
+      cards[i].style.opacity = f;
+      cards[i].style.transform = "translateY(" + ((1-f)*28).toFixed(2) + "px)";
+    }
+
+    // sticky-scroll scrub: 7.9s -> last frame across the track
+    if(phase === "post"){
+      var sp = clamp(p / SCRUB_END_P, 0, 1);
+      var t = FREEZE + sp*(END_SAFE - FREEZE);
+      if(Math.abs(t - lastSeek) > 0.008){
+        try{ V.currentTime = t; lastSeek = t; }catch(e){}
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* ---- sticky header: hide when scrolling down, reveal when scrolling up ---- */
+  var lastY = window.pageYOffset || 0;
+  var navHidden = false;
+  var navTick = false;
+  function onScroll(){
+    var y = window.pageYOffset || 0;
+    var dy = y - lastY;
+    if(Math.abs(dy) > 4){
+      if(y <= 140 || dy > 0){           // near the top OR scrolling down -> show
+        if(navHidden){ nav.classList.remove("is-hidden"); navHidden = false; }
+      } else {                          // scrolling up -> hide
+        if(!navHidden){ nav.classList.add("is-hidden"); navHidden = true; }
+      }
+      lastY = y;
+    }
+    navTick = false;
+  }
+  window.addEventListener("scroll", function(){
+    if(!navTick){ navTick = true; requestAnimationFrame(onScroll); }
+  }, {passive:true});
+})();
+
+/* ---- section 3: configurator (model + colour -> crossfading car image) ---- */
+(function(){
+  "use strict";
+
+  var carBox = document.getElementById("s3car");
+  var imgs   = [document.getElementById("s3carImgA"), document.getElementById("s3carImgB")];
+  var nameEl = document.getElementById("s3colorName");
+  var front  = 0;                                  // index of the currently shown image
+  var state  = { model: "neora-x1", color: "phantom-black" };
+
+  function fileFor(){ return state.model + "-" + state.color + ".png"; }
+
+  // crossfade to the image for the current model+colour
+  function updateCar(label){
+    if(!carBox) return;
+    var file = fileFor();
+    var back = imgs[front ^ 1];
+    back.onload = function(){
+      if(label){ back.alt = label; }
+      carBox.classList.remove("is-empty");
+      back.style.opacity = "1";
+      imgs[front].style.opacity = "0";
+      front ^= 1;
+    };
+    back.onerror = function(){
+      carBox.setAttribute("data-missing", file);
+      carBox.classList.add("is-empty");
+      imgs[0].style.opacity = "0";
+      imgs[1].style.opacity = "0";
+    };
+    back.src = file;
+  }
+
+  // colour swatches
+  var swatches = Array.prototype.slice.call(document.querySelectorAll(".s3-swatch"));
+  swatches.forEach(function(sw){
+    sw.addEventListener("click", function(){
+      swatches.forEach(function(s){ s.classList.remove("selected"); });
+      sw.classList.add("selected");
+      state.color = sw.getAttribute("data-color");
+      if(nameEl){ nameEl.textContent = sw.getAttribute("data-name"); }
+      updateCar();
+    });
+  });
+
+  // generic pill group (active toggle + optional callback)
+  function pillGroup(id, onSelect){
+    var group = document.getElementById(id);
+    if(!group) return;
+    var items = Array.prototype.slice.call(group.children);
+    items.forEach(function(it){
+      it.addEventListener("click", function(){
+        items.forEach(function(x){ x.classList.remove("active"); });
+        it.classList.add("active");
+        if(onSelect){ onSelect(it); }
+      });
+    });
+  }
+  pillGroup("s3tabs");                                   // Colour / Interior / Engine / Wheels
+
+  // initial load (single model: Neora X1)
+  updateCar("Neora X1");
+})();
+
+/* ---- section 4: tap / keyboard support (hover is handled in CSS) ---- */
+(function(){
+  "use strict";
+  var row = document.getElementById("s4row");
+  if(!row) return;
+  var cards = Array.prototype.slice.call(row.querySelectorAll(".t-card"));
+  function openOnly(card){
+    cards.forEach(function(c){ c.classList.toggle("is-open", c === card); });
+  }
+  cards.forEach(function(card){
+    card.addEventListener("click", function(){
+      openOnly(card.classList.contains("is-open") ? null : card);
+    });
+    card.addEventListener("focus", function(){ openOnly(card); });
+    card.addEventListener("keydown", function(e){
+      if(e.key === "Enter" || e.key === " "){ e.preventDefault(); openOnly(card); }
+    });
+  });
+  // tapping/clicking outside the row closes everything
+  document.addEventListener("click", function(e){
+    if(!row.contains(e.target)){ openOnly(null); }
+  });
+})();
+
+/* ---- section 6: x-ray reveal that follows the cursor ---- */
+(function(){
+  "use strict";
+  var car = document.getElementById("s6car");
+  if(!car) return;
+  var full = car.querySelector(".s6-full");
+  if(!full) return;
+
+  function move(pt){
+    var r = car.getBoundingClientRect();
+    var scale = car.offsetWidth ? (r.width / car.offsetWidth) : 1;
+    var x = (pt.clientX - r.left) / scale;
+    var y = (pt.clientY - r.top) / scale;
+    full.style.setProperty("--mx", x.toFixed(1) + "px");
+    full.style.setProperty("--my", y.toFixed(1) + "px");
+  }
+  car.addEventListener("mouseenter", function(e){ car.classList.add("is-xray"); move(e); });
+  car.addEventListener("mousemove", move);
+  car.addEventListener("mouseleave", function(){ car.classList.remove("is-xray"); });
+  // touch: drag the lens with a finger
+  car.addEventListener("touchstart", function(e){ if(e.touches[0]){ car.classList.add("is-xray"); move(e.touches[0]); } }, {passive:true});
+  car.addEventListener("touchmove", function(e){ if(e.touches[0]){ move(e.touches[0]); } }, {passive:true});
+  car.addEventListener("touchend", function(){ car.classList.remove("is-xray"); });
+})();
+</script>
+</body>
+</html>
