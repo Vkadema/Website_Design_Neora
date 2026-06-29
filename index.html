@@ -1,0 +1,1599 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Neora X1 — The future has arrived</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zalando+Sans:wght@400;500;600&family=Zalando+Sans+Expanded:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* ---- Figma color tokens ---- */
+  --white-1:#F8F9FA;   /* White 1st */
+  --white-2:#E3E4E5;   /* White 2nd */
+  --gray:#8A898A;      /* Gray */
+  --black:#08090A;     /* Black (page) — Figma section bg */
+  --ink:#08090A;       /* Figma Black token (on-light text) */
+  --blackout:#1F1D1D;  /* blackout gradient */
+  --nav-bg:rgba(28,28,31,.5);
+  --btn-light:#F8F9FA;
+  --btn-ghost:rgba(40,40,40,.25);
+  --card-bg:rgba(40,40,40,.25);
+  --panel-bg:rgba(40,40,40,.25);
+  --pill-shadow:0 4px 4px rgba(20,19,21,.3);
+  --glass-shadow:
+    inset 1px 1px 1px -1px rgba(255,255,255,.45),
+    inset -1px -1px 1px -1px rgba(255,255,255,.12),
+    inset 1.5px 0 3px -3px rgba(140,180,255,.30),
+    inset -1.5px 0 3px -3px rgba(255,170,120,.26),
+    inset 0 0 0 1px rgba(255,255,255,.06),
+    0 8px 24px rgba(0,0,0,.30);
+  /* ---- type ---- */
+  --exp:"Zalando Sans Expanded","Zalando Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --sans:"Zalando Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--black);color:var(--white-1);}
+body{font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+img,svg{display:block;}
+
+/* ====== scroll structure ====== */
+/* .track is tall; the .stage sticks while the page scrolls through it.
+   Total scrub distance = (track height − 100vh). */
+.track{position:relative;height:380vh;}                 /* 100vh hero + scrub + metrics + Neora X1 slide-over */
+.stage{position:sticky;top:0;height:100vh;width:100%;overflow:hidden;background:var(--black);z-index:1;}
+
+/* full-bleed video behind everything */
+.bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;background:var(--black);z-index:0;}
+
+/* ====== blackout group (3 stacked overlay gradients + subtle blur) ======
+   No z-index / opacity here on purpose: the container must NOT form a
+   stacking context, otherwise mix-blend can't reach the video painted below
+   it in .stage. The darkening is faded via the gradient alpha (--blk-a). */
+.blackout{position:absolute;inset:0;pointer-events:none;}
+.blk-grad{position:absolute;left:0;top:-2.78vh;width:100%;height:61.1vh;
+  background:linear-gradient(180deg,rgba(31,29,29,var(--blk-a,0)) 0%,rgba(31,29,29,0) 100%);
+  mix-blend-mode:overlay;}
+/* один із верхніх шарів — звичайний blend: робить верх щільнішим; лише в hero
+   (керується --blk-solid-a, що згасає до секції 2). */
+.blk-grad.is-solid{mix-blend-mode:normal;
+  background:linear-gradient(180deg,rgba(31,29,29,var(--blk-solid-a,0)) 0%,rgba(31,29,29,0) 100%);}
+/* нижній віньєт: лише hero (теж на --blk-solid-a) */
+.blk-grad-bottom{position:absolute;left:0;bottom:0;width:100%;height:35.6vh;
+  background:linear-gradient(0deg,rgba(31,29,29,calc(var(--blk-solid-a,0) * .7)) 0%,rgba(31,29,29,0) 100%);
+  mix-blend-mode:overlay;}
+.blk-blur{position:absolute;left:0;top:0;width:100%;height:38.2vh;
+  background:rgba(31,29,29,.01);backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px);}
+
+/* ====== top-anchored design surface: 1920×1080 frame scaled to width ====== */
+.design{position:absolute;left:0;top:0;width:1920px;height:1080px;
+  transform-origin:top left;transform:scale(var(--scale,1));z-index:2;}
+
+/* ---------- header (fixed to top across the whole page) ---------- */
+.nav-fixed{position:fixed;top:0;left:0;width:1920px;transform-origin:top left;transform:scale(var(--scale,1));
+  z-index:50;pointer-events:none;}
+.nav{position:relative;width:1920px;padding:24px 40px;pointer-events:none;
+  transition:transform .42s cubic-bezier(.4,0,.2,1);will-change:transform;}
+.nav.is-hidden{transform:translateY(-140px);}
+/* reveal-маску тримаємо на самій плашці: маска і backdrop-filter уживаються на
+   одному елементі, а маска чи opacity на ПРЕДКУ .nav глушили б блюр скла. */
+.nav-pill{display:flex;align-items:center;justify-content:space-between;width:100%;pointer-events:auto;
+  padding:12px 12px 12px 44px;border-radius:200px;background:var(--nav-bg);
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 calc(var(--nav-rev,0%) - 16%),transparent var(--nav-rev,0%));
+          mask-image:linear-gradient(to bottom,#000 0%,#000 calc(var(--nav-rev,0%) - 16%),transparent var(--nav-rev,0%));}
+.nav-left{display:flex;align-items:center;gap:44px;min-width:0;}
+.nav-logo{display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+.nav-logo svg{width:51.625px;height:38.427px;}
+.nav-links{display:flex;gap:40px;align-items:center;min-width:0;
+  font-family:var(--exp);font-weight:500;font-size:18px;line-height:1.12;color:var(--white-1);white-space:nowrap;}
+.nav-links a{color:inherit;text-decoration:none;opacity:.8;}
+.nav-cta-wrap{display:flex;align-items:center;justify-content:flex-end;gap:28px;}
+.nav-phone{display:flex;align-items:center;gap:10px;font-family:var(--exp);font-weight:500;font-size:18px;line-height:1.12;color:var(--white-1);text-decoration:none;white-space:nowrap;}
+.nav-phone svg{width:22px;height:22px;flex:0 0 auto;}
+.nav-cta{display:flex;align-items:center;justify-content:center;padding:16px 32px;border:0;cursor:pointer;
+  border-radius:200px;background:var(--btn-light);
+  font-family:var(--exp);font-weight:600;font-size:18px;line-height:1.12;color:var(--ink);white-space:nowrap;}
+
+/* ---------- section 1: headline (top-anchored, lives in .design) ---------- */
+.s1-top{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;will-change:opacity,transform;}
+.headline{position:absolute;left:0;top:174.55px;width:1920px;margin:0;text-align:center;
+  font-family:var(--exp);font-size:90px;line-height:1.05;letter-spacing:-.9px;color:var(--white-1);}
+.headline .grad{font-weight:600;
+  background:linear-gradient(180deg,#ffffff 0%,#dcdcdc 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;}
+.headline .ital{font-weight:500;font-style:italic;color:var(--gray);}
+
+/* ---------- section 1: bottom block (always 100px from the screen bottom) ---------- */
+.s1-bottom-scale{position:absolute;left:0;bottom:80px;width:1920px;
+  transform-origin:bottom left;transform:scale(var(--scale,1));z-index:2;}
+.s1-bottom{padding:0 80px;display:flex;align-items:flex-end;justify-content:space-between;gap:40px;
+  opacity:0;will-change:opacity,transform;}
+.s1-left{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:14px;align-items:flex-start;}
+.s1-meet{margin:0;font-family:var(--exp);font-weight:600;font-size:48px;line-height:.92;color:var(--white-1);white-space:nowrap;}
+.s1-meet .x1{font-weight:700;font-style:italic;}
+.s1-desc{margin:0;width:306px;max-width:100%;font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.3;color:var(--white-2);}
+.s1-actions{display:flex;gap:20px;align-items:center;flex:0 0 auto;}
+.s1-btn{display:flex;align-items:center;justify-content:center;gap:16px;width:312px;padding:20px 32px;border:0;cursor:pointer;
+  border-radius:200px;font-family:var(--exp);font-weight:600;font-size:20px;line-height:1.12;color:var(--white-1);white-space:nowrap;}
+.s1-btn-ghost{background:rgba(255,255,255,.05);}
+.s1-btn-fill{background:rgba(255,255,255,.25);}
+.s1-btn svg{width:24px;height:auto;flex:0 0 auto;}
+.s1-preview{flex:1 1 0;min-width:0;display:flex;justify-content:flex-end;align-items:flex-end;}
+.s1-preview-card{padding:6px;border-radius:28px;background:rgba(40,40,40,.25);
+  backdrop-filter:blur(13px) saturate(1.4);-webkit-backdrop-filter:blur(13px) saturate(1.4);}
+.s1-preview-inner{position:relative;width:310px;height:180px;border-radius:22px;overflow:hidden;background:#0c0f13;}
+.s1-preview-inner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.s1-preview-inner.is-empty img{display:none;}
+.s1-preview-inner.is-empty::after{content:attr(data-img);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:0 10px;font-family:var(--exp);font-weight:500;font-size:13px;color:rgba(248,249,250,.25);}
+.s1-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border:0;cursor:pointer;padding:0;
+  border-radius:50%;background:rgba(248,249,250,.16);display:flex;align-items:center;justify-content:center;}
+.s1-play svg{width:22px;height:22px;margin-left:3px;}
+
+/* ---------- section 2 ---------- */
+.s2-title{position:absolute;left:80px;top:160px;z-index:2;display:flex;flex-direction:column;gap:12px;
+  opacity:0;will-change:opacity,transform;}
+.s2-h{margin:0;font-family:var(--exp);font-weight:600;font-size:60px;line-height:1.12;letter-spacing:-.6px;color:var(--white-1);}
+.s2-h .ital{font-weight:500;font-style:italic;color:var(--gray);}
+.s2-right{position:absolute;right:80px;top:160px;width:412px;z-index:2;display:flex;flex-direction:column;gap:12px;
+  opacity:0;will-change:opacity,transform;}
+.s2-right-h{margin:0;font-family:var(--exp);font-weight:600;font-size:22px;line-height:1.2;color:var(--white-1);}
+.s2-right-p{margin:0;font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.3;color:var(--gray);}
+
+/* metric cards: bottom-anchored so they stay visible at any resolution */
+.metrics{position:absolute;left:0;bottom:80px;width:1920px;
+  transform-origin:bottom left;transform:scale(var(--scale,1));padding:0 80px;z-index:2;
+  display:flex;align-items:center;gap:24px;}
+.card{flex:1 0 0;min-width:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;
+  padding:28px 38px;border-radius:24px;background:var(--card-bg);opacity:0;will-change:opacity,transform;}
+.m-val{margin:0;font-family:var(--exp);font-weight:600;font-size:40px;line-height:1.12;color:var(--white-1);white-space:nowrap;}
+.m-label{margin:0;font-family:var(--sans);font-weight:400;font-size:18px;line-height:1.12;color:var(--white-2);white-space:nowrap;}
+
+/* ====== Neora X1 — feature section ====== */
+.feat{position:relative;z-index:2;width:100%;min-height:100vh;height:calc(var(--scale,1) * 1011px);
+  margin-top:-100vh;background:var(--black);overflow:hidden;border-radius:32px 32px 0 0;}
+.feat-design{position:absolute;left:0;top:0;width:1920px;height:1011px;transform-origin:top left;transform:scale(var(--scale,1));}
+/* одне суцільне фонове зображення секції (вордмарк + авто + фон у ньому) */
+.feat-bg{position:absolute;left:-311px;top:-25.5px;width:2097px;height:970px;z-index:0;}
+.feat-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;}
+.feat-bg.is-empty img{display:none;}
+.feat-bg.is-empty{background:radial-gradient(ellipse 60% 80% at 32% 55%,#0e1217 0%,#06080a 72%);}
+.feat-bg.is-empty::after{content:attr(data-img);position:absolute;left:7%;top:50%;transform:translateY(-50%);
+  font-family:var(--exp);font-weight:500;font-size:22px;color:rgba(248,249,250,.2);}
+.feat-right{position:absolute;left:1339px;top:250.33px;width:474px;z-index:2;}
+.feat-desc{margin:0;font-family:var(--exp);font-weight:400;font-size:30px;line-height:1.28;color:var(--white-2);}
+.feat-actions{position:absolute;left:1339px;top:521px;width:400px;z-index:2;display:flex;flex-direction:column;gap:16px;}
+.feat-btn{display:flex;align-items:center;justify-content:center;width:100%;padding:20px 32px;border:0;cursor:pointer;
+  border-radius:200px;font-family:var(--exp);font-weight:600;font-size:18px;line-height:1.12;white-space:nowrap;}
+.feat-btn-fill{background:var(--white-1);color:var(--ink);}
+.feat-btn-ghost{background:rgba(255,255,255,.05);color:var(--white-1);}
+
+/* ====== section 3: Find your Perfect Match (Neora S1 configurator) ====== */
+.s3{position:relative;width:100%;height:calc(var(--scale,1) * 1014px);background:var(--black);overflow:hidden;}
+.s3-design{position:absolute;left:0;top:-20px;width:1920px;height:1034px;transform-origin:top left;transform:scale(var(--scale,1));}
+
+.s3-glow{position:absolute;left:504px;top:231px;width:1526px;height:852px;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 50% 50% at 50% 48%, rgba(122,126,142,.22) 0%, rgba(122,126,142,.06) 45%, rgba(0,0,0,0) 70%);}
+.s3-platform{position:absolute;left:704px;top:792px;width:1141px;height:130px;z-index:1;border-radius:50%;
+  background:radial-gradient(ellipse 50% 50% at 50% 50%, rgba(248,249,250,.05) 0%, rgba(0,0,0,0) 68%);
+  box-shadow:inset 0 -1px 0 rgba(248,249,250,.06);}
+/* Car container matches the exported render node bounds (Figma "neora-s1", 1416x802.5).
+   Images are exported at @2x — object-fit + fixed design-px box renders them at the
+   intended 1x size automatically, so any @2x asset just looks sharper, never bigger/smaller. */
+.s3-car{position:absolute;left:359.26px;top:142.9px;width:1722.42px;height:961.67px;z-index:2;}
+.s3-car-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;
+  opacity:0;transition:opacity .45s ease;will-change:opacity;}
+.s3-car.is-empty::after{content:attr(data-missing);position:absolute;left:186px;top:192px;width:1170px;height:530px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--exp);font-weight:500;font-size:30px;color:rgba(248,249,250,.22);
+  border:1px dashed rgba(248,249,250,.12);border-radius:24px;}
+.s3-360{position:absolute;left:1251px;top:931px;z-index:2;font-family:var(--sans);font-weight:400;font-size:18px;color:rgba(138,137,138,.7);}
+.s3-fade{position:absolute;left:0;bottom:0;width:1920px;height:179.423px;z-index:2;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(8,9,10,0) 0%,#08090a 100%);}
+/* Characteristics toggle (right) */
+.s3-char{position:absolute;left:1560px;top:338px;width:280px;height:391px;z-index:4;}
+.s3-char-toggle{position:absolute;right:0;top:0;height:56px;width:56px;
+  display:flex;align-items:center;justify-content:center;gap:0;
+  padding:0;box-sizing:border-box;border:0;cursor:pointer;border-radius:200px;
+  background:rgba(255,255,255,.05);font-family:var(--exp);font-weight:600;font-size:16px;line-height:1;color:var(--white-1);
+  white-space:nowrap;overflow:hidden;transition:width .45s cubic-bezier(.4,0,.2,1),background .45s ease;}
+.s3-char.is-open .s3-char-toggle{width:280px;background:rgba(40,40,40,.25);}
+.s3-char-label{max-width:0;opacity:0;margin-right:0;overflow:hidden;
+  transition:max-width .45s cubic-bezier(.4,0,.2,1),opacity .35s ease,margin-right .45s cubic-bezier(.4,0,.2,1);}
+.s3-char.is-open .s3-char-label{max-width:170px;opacity:1;margin-right:12px;}
+.s3-char-dots{width:24px;height:24px;flex:0 0 auto;}
+.s3-char-card{position:absolute;left:0;top:68px;width:280px;box-sizing:border-box;padding:28px 28px 28px 24px;border-radius:24px;background:rgba(40,40,40,.25);
+  display:flex;flex-direction:column;gap:29px;
+  opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .35s ease,transform .35s ease;}
+.s3-char.is-open .s3-char-card{opacity:1;transform:translateY(0);pointer-events:auto;}
+.s3-char-row{display:flex;align-items:center;gap:12px;}
+.s3-char-row > svg{width:26px;height:26px;flex:0 0 auto;color:var(--white-1);}
+.s3-char-txt{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.s3-char-val{margin:0;font-family:var(--exp);line-height:1.12;color:var(--white-1);white-space:nowrap;}
+.s3-char-val b{font-weight:600;font-size:18px;}
+.s3-char-val span{font-weight:400;font-size:16px;color:var(--white-2);}
+.s3-char-lab{margin:0;font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.16;color:rgba(227,228,229,.75);}
+
+.s3-title{position:absolute;left:543.5px;top:89px;width:833px;z-index:3;
+  display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;}
+.s3-h{margin:0;font-family:var(--exp);font-weight:600;font-size:60px;line-height:1.12;color:var(--white-1);white-space:nowrap;}
+.s3-h .ital{font-weight:500;font-style:italic;color:var(--gray);}
+.s3-sub{margin:0;width:100%;font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.28;color:var(--gray);}
+
+.s3-models{position:absolute;left:1021px;top:318px;z-index:3;
+  display:flex;align-items:center;gap:8px;background:rgba(40,40,40,.25);padding:6px;border-radius:63px;}
+.s3-model{width:160px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:60px;cursor:pointer;
+  font-family:var(--exp);font-weight:500;font-size:18px;color:var(--white-1);opacity:.8;white-space:nowrap;}
+.s3-model.active{background:var(--white-1);color:var(--ink);font-weight:600;}
+
+.s3-config{position:absolute;left:70px;top:318px;width:480px;z-index:3;display:flex;flex-direction:column;gap:14px;}
+.s3-tabs{display:flex;align-items:center;background:rgba(40,40,40,.25);padding:6px;border-radius:63px;}
+.s3-tab{flex:1;min-width:0;height:40px;display:flex;align-items:center;justify-content:center;padding:0 24px;border-radius:60px;
+  font-family:var(--exp);font-weight:500;font-size:16px;color:var(--white-1);opacity:.8;white-space:nowrap;cursor:pointer;}
+.s3-tab.active{background:var(--white-1);color:var(--ink);font-weight:600;}
+
+.s3-panel{width:480px;background:var(--panel-bg);border-radius:26px;padding:24px;display:flex;flex-direction:column;gap:28px;}
+.s3-pane{display:none;flex-direction:column;gap:16px;}
+.s3-pane.is-active{display:flex;}
+/* swatches (Colour / Interior) */
+.s3-swatches{display:flex;gap:10px;height:190px;}
+.s3-swatch{flex:1 0 0;min-width:0;height:100%;padding:0;border:0;border-radius:10px;background:var(--c,#0a0a0a);position:relative;cursor:pointer;overflow:hidden;}
+.s3-swatch::after{content:"";position:absolute;inset:0;border-radius:10px;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,0) 38%,rgba(0,0,0,.22) 100%);}
+.s3-swatch.selected{outline:1.5px solid var(--white-1);outline-offset:3px;}
+.s3-sw-price{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:14px 6px 8px;text-align:center;white-space:nowrap;
+  font-family:var(--exp);font-weight:600;font-size:12px;line-height:1.1;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);
+  background:linear-gradient(to top,rgba(0,0,0,.62) 0%,rgba(0,0,0,0) 100%);}
+.s3-sw-price.is-free{font-weight:500;color:rgba(255,255,255,.85);}
+/* rows (Engine / Wheels) */
+.s3-rows{display:flex;flex-direction:column;gap:8px;}
+.s3-row{display:flex;align-items:center;gap:14px;width:100%;padding:12px 16px;border:1px solid rgba(248,249,250,.08);
+  border-radius:14px;background:rgba(255,255,255,.03);cursor:pointer;text-align:left;
+  transition:background .2s ease,border-color .2s ease;}
+.s3-row:hover{background:rgba(255,255,255,.06);}
+.s3-row.selected{border-color:var(--white-1);background:rgba(255,255,255,.07);}
+.s3-row-info{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.s3-row-name{font-family:var(--exp);font-weight:600;font-size:16px;line-height:1.2;color:var(--white-1);}
+.s3-row-sub{font-family:var(--sans);font-weight:400;font-size:13px;line-height:1.2;color:var(--gray);}
+.s3-row-price{flex:0 0 auto;font-family:var(--exp);font-weight:600;font-size:15px;line-height:1.2;color:var(--white-2);white-space:nowrap;}
+.s3-row-price.is-free{font-weight:400;font-size:13px;color:var(--gray);}
+.s3-color{margin:0;display:flex;gap:6px;font-family:var(--sans);font-weight:500;font-size:16px;line-height:1.12;color:var(--gray);}
+.s3-panel-bottom{display:flex;flex-direction:column;gap:28px;}
+.s3-total-wrap{display:flex;flex-direction:column;gap:28px;}
+.s3-divider{height:1px;width:100%;background:rgba(248,249,250,.15);}
+.s3-total{display:flex;align-items:flex-end;justify-content:space-between;}
+.s3-total-label{font-family:var(--sans);font-weight:500;font-size:18px;line-height:1.12;color:var(--gray);}
+.s3-total-val{display:flex;align-items:center;gap:4px;font-family:var(--exp);font-weight:600;font-size:26px;line-height:1.12;color:var(--white-1);}
+.s3-reserve{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:20px 32px;border:0;cursor:pointer;
+  border-radius:200px;background:var(--white-1);font-family:var(--exp);font-weight:600;font-size:18px;line-height:1.12;color:var(--ink);}
+.s3-reserve svg{width:24px;height:auto;flex:0 0 auto;}
+
+/* ====== section 4: Technology Designed Around You (expanding cards) ====== */
+.s4{position:relative;width:100%;height:calc(var(--scale,1) * 1001px);background:var(--black);overflow:hidden;}
+.s4-design{position:absolute;left:0;top:0;width:1920px;height:1041px;transform-origin:top left;transform:scale(var(--scale,1));}
+
+.s4-title{position:absolute;left:70px;top:150px;width:1780px;z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;}
+.s4-h{margin:0;font-family:var(--exp);font-weight:600;font-size:60px;line-height:1.12;color:var(--white-1);}
+.s4-h .ital{font-weight:500;font-style:italic;color:var(--gray);}
+.s4-sub{margin:0;font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.28;color:var(--gray);}
+
+.s4-row{position:absolute;left:70px;top:466px;width:1780px;height:375px;display:flex;gap:20px;}
+.t-card{position:relative;flex:1 1 0;min-width:0;height:375px;display:flex;align-items:stretch;
+  border-radius:32px;overflow:hidden;background:rgba(255,255,255,.06);
+  transition:flex-grow .55s cubic-bezier(.4,0,.2,1);cursor:pointer;}
+.t-card:hover,.t-card.is-open{flex-grow:3.03;}
+
+/* text panel (left), revealed on hover */
+.t-panel{flex:0 0 auto;width:0;overflow:hidden;transition:width .55s cubic-bezier(.4,0,.2,1);}
+.t-card:hover .t-panel,.t-card.is-open .t-panel{width:377px;}
+.t-panel-inner{box-sizing:border-box;width:377px;height:375px;padding:176px 32px 0;}
+.t-desc{margin:0;font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.32;color:var(--gray);
+  opacity:0;transition:opacity .4s ease .12s;}
+.t-card:hover .t-desc,.t-card.is-open .t-desc{opacity:1;}
+
+/* image (right) — normal colour; darkened by .t-dim when closed, clear when open */
+.t-media{flex:1 1 0;min-width:0;position:relative;align-self:stretch;overflow:hidden;border-radius:20px;}
+.t-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;}
+.t-dim{position:absolute;inset:0;background:rgba(8,9,10,.34);transition:opacity .5s ease;}
+.t-card:hover .t-dim,.t-card.is-open .t-dim{opacity:0;}
+.t-grad{position:absolute;left:0;right:0;bottom:0;height:90px;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(8,9,10,0) 0%,rgba(8,9,10,.85) 100%);opacity:.8;}
+.t-media.is-empty{background:rgba(255,255,255,.04);}
+.t-media.is-empty img{display:none;}
+.t-media.is-empty::before{content:attr(data-img);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:0 16px;font-family:var(--exp);font-weight:500;font-size:18px;color:rgba(248,249,250,.22);}
+
+/* card title — stays at top-left in both states */
+.t-title{position:absolute;left:32px;top:55px;width:184px;margin:0;z-index:3;pointer-events:none;
+  font-family:var(--exp);font-weight:600;font-size:28px;line-height:1.2;color:var(--white-1);}
+
+/* ====== section 5: Built for a Cleaner Future ====== */
+.s5{position:relative;width:100%;height:calc(var(--scale,1) * 1032px);background:var(--black);overflow:hidden;}
+.s5-design{position:absolute;left:0;top:0;width:1920px;height:1032px;transform-origin:top left;transform:scale(var(--scale,1));}
+/* навколишній фон: фото на всю секцію (1920×1032), затемнене знизу */
+.s5-ambient{position:absolute;left:0;top:0;width:1920px;height:1032px;z-index:0;
+  overflow:hidden;pointer-events:none;}
+.s5-ambient-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:bottom;}
+.s5-ambient.is-empty{filter:none;background:radial-gradient(ellipse 70% 90% at 50% 55%,#10171c 0%,#06080a 75%);}
+.s5-ambient-fade{position:absolute;inset:0;
+  background:linear-gradient(0deg,#08090A 0%,rgba(17,18,19,.67) 15.6%,rgba(36,36,36,0) 39.7%);}
+/* панель: фон видно крізь білий overlay (освітлює); градієнтна біла рамка.
+   БЕЗ transform/z-index — інакше створюється stacking context і mix-blend-overlay не змішується з фоном */
+.s5-panel{position:absolute;left:70.62px;top:129.43px;width:1780px;height:780px;
+  border-radius:38px;overflow:hidden;box-shadow:0 4px 50px rgba(8,9,10,.2);}
+.s5-panel-overlay{position:absolute;inset:0;background:rgba(255,255,255,.2);mix-blend-mode:overlay;pointer-events:none;}
+.s5-panel::after{content:"";position:absolute;inset:0;border-radius:38px;padding:1.5px;pointer-events:none;z-index:6;
+  background:linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.1));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;}
+/* ліва картка (скло додається в спільному glass-блоці) */
+.s5-card{position:absolute;left:0;top:0;width:700px;height:100%;z-index:2;
+  display:flex;flex-direction:column;justify-content:space-between;padding:64px 72px;background:rgba(40,40,40,.25);}
+.s5-head{display:flex;flex-direction:column;gap:20px;}
+.s5-h{margin:0;width:539px;max-width:100%;font-family:var(--exp);font-weight:600;font-size:60px;line-height:1.12;color:var(--white-1);}
+.s5-h .ital{font-weight:500;font-style:italic;}
+.s5-para{margin:0;font-family:var(--sans);font-weight:400;font-size:18px;line-height:1.38;color:var(--white-2);}
+.s5-para p{margin:0 0 6px;}
+.s5-para p:last-child{margin:0;}
+/* battery під-картка з play */
+.s5-battery{width:100%;border-radius:36px;background:rgba(40,40,40,.25);overflow:hidden;}
+.s5-battery-inner{position:relative;width:100%;height:323px;border-radius:32px;overflow:hidden;background:#0c1116;}
+.s5-battery-inner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.s5-battery-inner.is-empty img{display:none;}
+.s5-battery-inner.is-empty::after{content:attr(data-img);position:absolute;left:0;bottom:14px;width:100%;text-align:center;
+  font-family:var(--exp);font-weight:500;font-size:14px;color:rgba(248,249,250,.25);}
+.s5-battery-cta{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:270px;height:90px;}
+.s5-battery-pill{position:absolute;left:0;top:50%;transform:translateY(-50%);width:270px;box-sizing:border-box;padding:12px 22px 12px 102px;
+  border-radius:74px;background:rgba(255,255,255,.04);font-family:var(--sans);font-weight:400;font-size:18px;line-height:1.16;color:#fff;}
+.s5-battery-play{position:absolute;left:0;top:0;width:90px;height:90px;border:0;cursor:pointer;padding:0;border-radius:50%;
+  background:rgba(248,249,250,.16);display:flex;align-items:center;justify-content:center;}
+.s5-battery-play svg{width:30px;height:30px;margin-left:3px;}
+/* праві плаваючі елементи */
+.s5-bookbtn{position:absolute;left:752px;top:67px;width:357px;z-index:2;display:flex;align-items:center;justify-content:center;
+  padding:20px 32px;border:0;cursor:pointer;border-radius:200px;background:var(--white-1);
+  font-family:var(--exp);font-weight:600;font-size:18px;line-height:1.12;color:var(--ink);}
+.s5-renew{position:absolute;right:31px;top:31px;width:300px;z-index:2;box-sizing:border-box;
+  display:flex;flex-direction:column;align-items:center;gap:6px;padding:24px 32px;border-radius:22px;background:rgba(255,255,255,.05);}
+.s5-renew-num{margin:0;font-family:var(--exp);font-weight:600;font-size:52px;line-height:1.12;color:var(--white-1);}
+.s5-renew-lab{margin:0;font-family:var(--sans);font-weight:500;font-size:18px;line-height:1.12;color:var(--white-1);}
+.s5-stats{position:absolute;right:-2px;top:660px;width:1080px;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:0 20px;}
+.s5-stat{flex:1 0 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.s5-stat-num{margin:0;font-family:var(--exp);font-weight:600;font-size:32px;line-height:1.2;color:var(--white-1);white-space:nowrap;}
+.s5-stat-lab{margin:0;font-family:var(--sans);font-weight:400;font-size:18px;line-height:1.2;color:var(--white-2);white-space:nowrap;}
+
+/* ====== section 6: We have Nothing to Hide (x-ray reveal) ====== */
+.s6{position:relative;width:100%;height:calc(var(--scale,1) * 1138px);background:var(--black);overflow:hidden;}
+.s6-design{position:absolute;left:0;top:-20px;width:1920px;height:1158px;transform-origin:top left;transform:scale(var(--scale,1));}
+.s6-floor{position:absolute;left:319px;top:528px;width:1282px;height:200px;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(214,170,110,.10) 0%,rgba(0,0,0,0) 70%);}
+.s6-car{position:absolute;left:0;top:169px;width:1920px;height:958px;z-index:1;}
+.s6-fade{position:absolute;left:0;bottom:0;width:1920px;height:238.444px;z-index:2;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(8,9,10,0) 0%,#08090a 100%);}
+.s6-car img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;}
+.s6-cut{z-index:1;}
+.s6-full{z-index:2;}
+/* x-ray hole follows the cursor; outside the hole the full car stays opaque */
+.s6-car.is-xray .s6-full{
+  -webkit-mask-image:radial-gradient(circle at var(--mx,-400px) var(--my,-400px),transparent 0,transparent 60px,#000 165px);
+          mask-image:radial-gradient(circle at var(--mx,-400px) var(--my,-400px),transparent 0,transparent 60px,#000 165px);}
+.s6-car.is-empty::after{content:attr(data-img);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font-family:var(--exp);font-weight:500;font-size:24px;color:rgba(248,249,250,.2);text-align:center;}
+
+/* callout reveal: dot -> line grows from dot -> glass label fades in (staggered on view) */
+.s6-dot{opacity:0;}
+.s6-line{stroke-dasharray:1;stroke-dashoffset:1;}
+.s6 .s6-label{opacity:0;transform:translateX(-14px);}
+.s6.is-revealed .s6-dot{animation:s6dot .25s ease forwards;animation-delay:var(--d,0s);}
+.s6.is-revealed .s6-line{animation:s6draw .55s cubic-bezier(.4,0,.2,1) forwards;animation-delay:calc(var(--d,0s) + .1s);}
+.s6.is-revealed .s6-label{animation:s6lab .45s ease forwards;animation-delay:calc(var(--d,0s) + .62s);}
+@keyframes s6dot{to{opacity:1;}}
+@keyframes s6draw{to{stroke-dashoffset:0;}}
+@keyframes s6lab{to{opacity:1;transform:translateX(0);}}
+@media (prefers-reduced-motion:reduce){
+  .s6-dot,.s6 .s6-label{opacity:1;transform:none;}
+  .s6-line{stroke-dashoffset:0;}}
+
+.s6-lines{position:absolute;left:0;top:0;width:1920px;height:1158px;z-index:2;pointer-events:none;overflow:visible;}
+.s6-title{position:absolute;left:535px;top:122px;width:849px;z-index:4;
+  display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;}
+.s6-h{margin:0;font-family:var(--exp);font-weight:600;font-size:60px;line-height:1.12;color:var(--white-1);white-space:nowrap;}
+.s6-h .ital{font-weight:500;font-style:italic;color:var(--gray);}
+.s6-sub{margin:0;font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.28;color:var(--gray);}
+/* ===== glass material — shared across all glass components ===== */
+.nav-pill,.card,.s3-tabs,.s3-models,.s3-panel,.btn-ghost,.s6-label{
+  backdrop-filter:blur(20px) saturate(1.6) brightness(1.05);
+  -webkit-backdrop-filter:blur(20px) saturate(1.6) brightness(1.05);
+  box-shadow:
+    inset 1px 1px 1px -1px rgba(255,255,255,.45),    /* Light -45deg: top-left edge (subtle) */
+    inset -1px -1px 1px -1px rgba(255,255,255,.12),   /* faint bottom-right edge */
+    inset 1.5px 0 3px -3px rgba(140,180,255,.30),     /* Dispersion: cool left fringe */
+    inset -1.5px 0 3px -3px rgba(255,170,120,.26),    /* Dispersion: warm right fringe */
+    inset 0 0 0 1px rgba(255,255,255,.06),            /* Depth: thin rim */
+    0 8px 24px rgba(0,0,0,.30);}                      /* drop shadow */
+/* Refraction/Splay: distort the backdrop via SVG displacement (Chrome/Edge; graceful fallback elsewhere). */
+@supports (backdrop-filter:url(#glass)){
+  .nav-pill,.card,.s3-tabs,.s3-models,.s3-panel,.btn-ghost,.s6-label{
+    backdrop-filter:blur(13px) saturate(1.6) brightness(1.05) url(#glass);}}
+
+/* ===== per-element glass (distinct Frost levels from Figma) ===== */
+.feat-btn-ghost{box-shadow:var(--glass-shadow);
+  backdrop-filter:blur(2px) saturate(1.5) brightness(1.05);-webkit-backdrop-filter:blur(2px) saturate(1.5) brightness(1.05);}
+.s3-char-toggle,.s3-char-card{box-shadow:var(--glass-shadow);
+  backdrop-filter:blur(13px) saturate(1.6) brightness(1.05);-webkit-backdrop-filter:blur(13px) saturate(1.6) brightness(1.05);}
+.s5-renew{box-shadow:var(--glass-shadow);
+  backdrop-filter:blur(6px) saturate(1.5) brightness(1.05);-webkit-backdrop-filter:blur(6px) saturate(1.5) brightness(1.05);}
+.s5-card{box-shadow:var(--glass-shadow);
+  backdrop-filter:blur(30px) saturate(1.6) brightness(1.05);-webkit-backdrop-filter:blur(30px) saturate(1.6) brightness(1.05);}
+.t-card{box-shadow:var(--glass-shadow);
+  backdrop-filter:blur(3px) saturate(1.5) brightness(1.05);-webkit-backdrop-filter:blur(3px) saturate(1.5) brightness(1.05);}
+.s7-card{box-shadow:var(--glass-shadow);
+  backdrop-filter:blur(24px) saturate(1.5) brightness(1.05);-webkit-backdrop-filter:blur(24px) saturate(1.5) brightness(1.05);}
+.s1-btn{box-shadow:var(--glass-shadow);
+  backdrop-filter:blur(13px) saturate(1.5) brightness(1.05);-webkit-backdrop-filter:blur(13px) saturate(1.5) brightness(1.05);}
+.s1-play,.s5-battery-play,.s5-battery-pill{box-shadow:var(--glass-shadow);
+  backdrop-filter:blur(8px) saturate(1.5) brightness(1.05);-webkit-backdrop-filter:blur(8px) saturate(1.5) brightness(1.05);}
+@supports (backdrop-filter:url(#glass)){
+  .feat-btn-ghost{backdrop-filter:blur(2px) saturate(1.5) brightness(1.05) url(#glass);}
+  .s3-char-toggle,.s3-char-card{backdrop-filter:blur(13px) saturate(1.6) brightness(1.05) url(#glass);}
+  .s5-renew{backdrop-filter:blur(6px) saturate(1.5) brightness(1.05) url(#glass);}
+  .s5-card{backdrop-filter:blur(30px) saturate(1.6) brightness(1.05) url(#glass);}
+  .t-card{backdrop-filter:blur(3px) saturate(1.5) brightness(1.05) url(#glass);}
+  .s7-card{backdrop-filter:blur(24px) saturate(1.5) brightness(1.05) url(#glass);}
+  .s1-btn{backdrop-filter:blur(13px) saturate(1.5) brightness(1.05) url(#glass);}
+  .s1-play,.s5-battery-play,.s5-battery-pill{backdrop-filter:blur(8px) saturate(1.5) brightness(1.05) url(#glass);}}
+
+.s6-label{position:absolute;z-index:3;pointer-events:none;display:inline-flex;padding:6px;border-radius:63px;white-space:nowrap;
+  background:rgba(40,40,40,.22);}
+.s6-label span{display:flex;align-items:center;height:40px;padding:0 24px;border-radius:60px;
+  font-family:var(--exp);font-weight:500;font-size:18px;line-height:1.12;color:var(--white-1);opacity:.92;
+  text-shadow:0 1px 2px rgba(0,0,0,.28);}
+
+/* ====== footer ====== */
+/* ====== section 7: Test Drive Booking Form ====== */
+.s7{position:relative;width:100%;height:calc(var(--scale,1) * 897px);background:var(--black);overflow:hidden;}
+.s7-design{position:absolute;left:0;top:0;width:1920px;height:897px;transform-origin:top left;transform:scale(var(--scale,1));}
+.s7-bg{position:absolute;inset:0;width:100%;height:100%;z-index:0;}
+.s7-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;}
+.s7-bg.is-empty{background:#0c1116;}
+.s7-bg.is-empty img{display:none;}
+.s7-bg.is-empty::after{content:attr(data-img);position:absolute;left:80px;bottom:60px;
+  font-family:var(--exp);font-weight:500;font-size:22px;color:rgba(248,249,250,.2);}
+.s7-tagline{position:absolute;left:80px;top:144px;width:1760px;margin:0;z-index:1;
+  font-family:var(--exp);font-weight:500;font-size:40px;line-height:1.32;color:var(--white-2);mix-blend-mode:overlay;}
+.s7-card{position:absolute;left:1210px;top:120px;width:630px;z-index:2;box-sizing:border-box;
+  padding:40px 48px;border-radius:38px;display:flex;flex-direction:column;gap:46px;
+  background-image:linear-gradient(90deg,rgba(40,40,40,.25),rgba(40,40,40,.25)),linear-gradient(90deg,rgba(255,255,255,.1),rgba(255,255,255,.1));}
+.s7-head{display:flex;flex-direction:column;gap:40px;}
+.s7-titlewrap{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;}
+.s7-h{margin:0;font-family:var(--exp);font-weight:600;font-size:46px;line-height:1.12;color:var(--white-1);}
+.s7-h .l2{color:var(--white-2);}
+.s7-sub{margin:0;font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.28;color:var(--white-2);}
+.s7-fields{display:flex;flex-direction:column;gap:16px;}
+.s7-field{display:flex;flex-direction:column;gap:8px;}
+.s7-label{font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.2;color:var(--white-2);}
+.s7-input{display:block;width:100%;height:54px;box-sizing:border-box;padding:16px 20px;border:0;border-radius:12px;background:#08090a;
+  font-family:var(--sans);font-weight:400;font-size:16px;line-height:1.2;color:var(--white-1);}
+.s7-input::placeholder{color:var(--gray);}
+.s7-input:focus{outline:1.5px solid rgba(248,249,250,.25);outline-offset:0;}
+.s7-row{display:flex;gap:16px;}
+.s7-row .s7-field{flex:1 1 0;min-width:0;}
+.s7-datewrap{position:relative;}
+.s7-datewrap .s7-input{padding-right:52px;cursor:pointer;}
+.s7-datewrap .s7-cal-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;padding:0;border:0;
+  display:flex;align-items:center;justify-content:center;background:transparent;cursor:pointer;border-radius:8px;color:var(--gray);}
+.s7-datewrap .s7-cal-btn:hover{color:var(--white-1);background:rgba(255,255,255,.05);}
+.s7-datewrap .s7-cal-btn svg{width:24px;height:24px;}
+/* calendar popup */
+.s7-cal{position:absolute;right:0;bottom:calc(100% + 8px);width:300px;z-index:20;box-sizing:border-box;
+  padding:16px;border-radius:16px;background:#0c1116;border:1px solid rgba(248,249,250,.1);
+  box-shadow:0 18px 50px rgba(0,0,0,.55);
+  opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .2s ease,transform .2s ease;}
+.s7-cal.is-open{opacity:1;transform:translateY(0);pointer-events:auto;}
+.s7-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.s7-cal-title{font-family:var(--exp);font-weight:600;font-size:16px;color:var(--white-1);}
+.s7-cal-nav{width:32px;height:32px;border:0;cursor:pointer;border-radius:8px;background:rgba(255,255,255,.05);color:var(--white-1);
+  display:flex;align-items:center;justify-content:center;}
+.s7-cal-nav:hover{background:rgba(255,255,255,.12);}
+.s7-cal-nav svg{width:16px;height:16px;}
+.s7-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.s7-cal-dow{height:30px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--sans);font-weight:500;font-size:12px;color:var(--gray);}
+.s7-cal-day{height:36px;border:0;cursor:pointer;border-radius:9px;background:transparent;
+  font-family:var(--sans);font-weight:400;font-size:14px;color:var(--white-1);display:flex;align-items:center;justify-content:center;}
+.s7-cal-day:hover{background:rgba(255,255,255,.08);}
+.s7-cal-day.is-muted{color:rgba(138,137,138,.5);}
+.s7-cal-day.is-today{box-shadow:inset 0 0 0 1px rgba(248,249,250,.3);}
+.s7-cal-day.is-sel{background:var(--white-1);color:var(--ink);font-weight:600;}
+.s7-cal-day.is-sel:hover{background:var(--white-1);}
+.s7-submit{display:flex;align-items:center;justify-content:center;width:100%;height:60px;border:0;cursor:pointer;
+  border-radius:200px;background:var(--white-1);font-family:var(--exp);font-weight:600;font-size:18px;line-height:1.12;color:var(--ink);}
+
+/* ====== booking modal ====== */
+.bookmodal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:24px;}
+.bookmodal.is-open{display:flex;}
+.bookmodal-backdrop{position:absolute;inset:0;background:rgba(2,5,13,.72);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+.bookmodal-dialog{position:relative;z-index:1;width:630px;max-width:100%;max-height:calc(100vh - 48px);overflow:visible;
+  animation:bmIn .28s cubic-bezier(.2,1,.36,1);}
+@keyframes bmIn{from{opacity:0;transform:translateY(14px) scale(.98);}to{opacity:1;transform:none;}}
+.bookmodal .s7-card{position:relative;left:auto;top:auto;width:100%;}
+.bookmodal-close{position:absolute;top:14px;right:14px;z-index:3;width:40px;height:40px;border:0;cursor:pointer;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);color:var(--white-1);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+.bookmodal-close:hover{background:rgba(255,255,255,.16);}
+.bookmodal-close svg{width:20px;height:20px;}
+@media (max-width:560px){
+  .bookmodal-dialog{max-height:calc(100vh - 24px);overflow:auto;}
+  .bookmodal .s7-card{padding:32px 22px;}
+}
+
+/* ====== footer ====== */
+.footer{position:relative;width:100%;height:calc(var(--scale,1) * 750px);background:var(--black);overflow:hidden;}
+.footer-design{position:absolute;left:0;top:0;width:1920px;height:750px;transform-origin:top left;transform:scale(var(--scale,1));
+  padding:80px;display:flex;flex-direction:column;gap:48px;}
+.footer-divider{position:absolute;left:0;top:0;width:100%;height:1px;background:rgba(248,249,250,.1);}
+.footer-top{display:flex;align-items:center;justify-content:space-between;width:100%;gap:40px;}
+.footer-logo{margin:0;font-family:var(--exp);font-weight:700;font-size:200px;line-height:1;letter-spacing:-2px;text-transform:uppercase;white-space:nowrap;
+  background:linear-gradient(90deg,#f8f9fa 0%,rgba(248,249,250,.25) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;}
+.footer-book{display:flex;align-items:center;justify-content:center;width:357px;height:60px;flex:0 0 auto;border:0;cursor:pointer;
+  border-radius:200px;background:var(--white-1);font-family:var(--exp);font-weight:600;font-size:18px;line-height:1.12;color:var(--ink);}
+.footer-main{display:flex;align-items:flex-start;justify-content:space-between;width:100%;padding-bottom:24px;}
+.footer-brand{display:flex;flex-direction:column;gap:16px;width:368px;}
+.footer-tagline{margin:0;font-family:var(--exp);font-weight:500;font-size:20px;line-height:1.6;color:var(--gray);}
+.footer-contacts{display:flex;flex-direction:column;gap:16px;align-items:flex-start;}
+.footer-email{font-family:var(--sans);font-weight:400;font-size:28px;line-height:1.6;color:var(--white-1);text-decoration:underline;white-space:nowrap;}
+.footer-phone{margin:0;font-family:var(--sans);font-weight:400;font-size:20px;line-height:1.6;color:var(--white-1);white-space:nowrap;}
+.footer-grid{display:flex;gap:32px;align-items:flex-start;}
+.footer-col{display:flex;flex-direction:column;gap:20px;width:199.33px;}
+.footer-col.is-legal{width:88px;}
+.footer-coltitle{margin:0;font-family:var(--exp);font-weight:600;font-size:16px;text-transform:uppercase;color:var(--gray);}
+.footer-links{display:flex;flex-direction:column;gap:12px;}
+.footer-links a{font-family:var(--sans);font-weight:400;font-size:18px;color:var(--white-1);text-decoration:none;}
+.footer-soc{display:flex;flex-direction:column;gap:20px;align-items:flex-start;}
+.footer-soctitle{margin:0;font-family:var(--exp);font-weight:600;font-size:16px;text-transform:uppercase;color:var(--gray);white-space:nowrap;}
+.footer-social{display:flex;gap:32px;align-items:center;}
+.footer-social a{display:flex;align-items:center;justify-content:center;width:24px;height:24px;color:var(--white-1);}
+.footer-social svg{width:24px;height:24px;}
+.footer-line{width:100%;height:1px;background:rgba(248,249,250,.1);}
+.footer-bottom{display:flex;align-items:flex-start;width:100%;}
+.footer-copy{margin:0;font-family:var(--sans);font-weight:400;font-size:13px;color:var(--gray);white-space:nowrap;}
+
+/* focus + reduced motion */
+a:focus-visible,button:focus-visible{outline:2px solid var(--white-1);outline-offset:3px;border-radius:200px;}
+.s3-row:focus-visible,.s3-swatch:focus-visible{outline:1.5px solid var(--white-1);outline-offset:2px;}
+@media (prefers-reduced-motion:reduce){.blk-grad{mix-blend-mode:normal;opacity:.6;}
+  .t-card,.t-panel,.t-desc,.t-dim{transition:none;}}
+
+/* ===== scroll reveals (fade in when section enters viewport) ===== */
+.s3-design,.s4-title,.s6-title,.s6-car{opacity:0;transition:opacity .7s ease;}
+.s3.is-in .s3-design{opacity:1;}
+.s4.is-in .s4-title{opacity:1;}
+.s6.is-revealed .s6-title,.s6.is-revealed .s6-car{opacity:1;}
+/* Cleaner Future: bg stays, panel slides in from the left (handled via left, not transform) */
+/* Technology cards: cascade left -> right */
+.s4-row .t-card{opacity:0;transform:translateY(22px);
+  transition:opacity .6s ease,transform .6s ease,flex-grow .55s cubic-bezier(.4,0,.2,1),background .4s ease;}
+.s4.is-in .s4-row .t-card{opacity:1;transform:translateY(0);}
+.s4.is-in .s4-row .t-card:nth-child(1){transition-delay:.05s,.05s,0s,0s;}
+.s4.is-in .s4-row .t-card:nth-child(2){transition-delay:.17s,.17s,0s,0s;}
+.s4.is-in .s4-row .t-card:nth-child(3){transition-delay:.29s,.29s,0s,0s;}
+.s4.is-in .s4-row .t-card:nth-child(4){transition-delay:.41s,.41s,0s,0s;}
+@media (prefers-reduced-motion:reduce){
+  .s3-design,.s4-title,.s6-title,.s6-car,.s5-panel,.s4-row .t-card{opacity:1;transform:none;transition:none;}}
+</style>
+</head>
+<body>
+<!-- fixed top header: scales to width, reveals on intro, hides on scroll-down / shows on scroll-up -->
+<div class="nav-fixed">
+  <header class="nav" id="nav">
+    <div class="nav-pill">
+      <div class="nav-left">
+        <div class="nav-logo" aria-label="Neora">
+          <svg width="52" height="39" viewBox="0 0 52 39" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20.7932 2.21525C21.1266 2.78923 22.4841 4.51694 22.9376 5.12469L28.3511 12.4674C28.7535 13.0237 29.2935 13.5566 29.6565 14.1093C30.5967 13.5544 32.2218 13.0086 33.2657 12.5545C34.5574 11.9927 35.8746 11.6439 37.1184 10.9078C36.7083 11.8551 36.1744 12.6411 35.6923 13.5389C34.8961 15.0198 34.1136 16.4451 33.1805 17.8448C32.8177 18.3893 32.5264 19.0871 32.1815 19.6575C31.4208 20.9157 30.716 22.2039 30.0132 23.4951C27.0015 19.6398 24.0677 15.7243 21.2137 11.7508C21.0794 11.9987 20.9181 12.2393 20.7682 12.4786C18.9959 15.3074 17.4587 18.2811 15.7498 21.1511C14.6609 22.9799 13.5962 24.8615 12.5744 26.7286C11.9828 27.8095 11.1516 28.9247 10.7788 30.0778C11.1507 29.9668 11.5219 29.8532 11.8924 29.7372C13.1069 29.2441 14.3586 28.7204 15.5814 28.2591C16.2711 27.9989 17.1391 27.8267 17.8478 27.5555C18.8806 27.1603 19.8787 26.7255 20.9488 26.4375C19.9382 27.0344 18.7746 27.5385 17.7498 28.1253L9.13382 33.0591C8.34533 33.5137 7.59188 34.039 6.79108 34.491L3.39758 36.4002C1.92385 37.2102 1.38833 37.3877 0 38.4274C0.204429 38.0019 0.69381 37.2158 0.947926 36.7545C1.88107 35.063 2.83454 33.3828 3.80828 31.7143C4.11232 31.1968 4.47074 30.6818 4.76322 30.1665L15.0634 12.0568C16.6037 9.39241 18.2284 6.7624 19.675 4.04542C20.0097 3.41664 20.4642 2.85277 20.7932 2.21525Z" fill="#F8F9FA"/>
+            <path d="M51.5356 0L51.6251 0.0157632C51.6284 -0.00509653 50.6337 1.58718 50.5409 1.75838C47.2551 7.70727 43.9083 13.6223 40.5013 19.5023C39.8761 20.5918 39.32 21.75 38.6777 22.8224C37.8266 24.0933 37.1549 25.4642 36.372 26.7642C35.6601 27.947 35.0893 29.1287 34.4371 30.3251C33.6669 31.7366 32.6779 32.9735 31.9983 34.4685C31.6927 35.1408 31.121 35.9416 30.7554 36.6306C30.2744 35.6818 29.3865 34.911 28.8059 34.0636C27.303 31.8701 25.5894 29.7821 24.0182 27.6475L22.3146 25.2904C22.0565 24.929 21.8127 24.5337 21.5401 24.1901C20.3706 24.5783 19.681 25.0469 18.6247 25.4733C17.8456 25.7803 17.0628 26.0779 16.2765 26.366C15.7749 26.5465 15.2178 26.7193 14.738 26.9363C15.3965 26.0763 15.6951 25.3374 16.2377 24.4411C17.3127 22.6653 18.3618 20.9473 19.3485 19.1202C19.9119 18.1062 21.113 16.4093 21.4462 15.51C21.8952 16.319 22.4878 17.0086 23.0625 17.7314C24.6174 19.6871 26.0267 21.7452 27.5814 23.6983C27.9699 24.1863 28.303 24.7343 28.695 25.2217C29.1949 25.8432 29.7371 26.4399 30.2722 27.0301C30.5746 26.5782 30.9055 25.9596 31.1807 25.4793C31.7681 24.4684 32.3417 23.4497 32.901 22.4232C33.746 20.9065 34.7502 19.4433 35.5388 17.8796C35.8282 17.3058 36.2559 16.7461 36.5524 16.1648C37.0801 14.9992 37.8247 13.9653 38.4419 12.8693C39.312 11.324 40.2953 9.64636 41.0564 8.05924C40.7576 8.21365 40.4591 8.32913 40.1409 8.43452C37.7271 9.23343 35.3143 10.0635 32.9323 10.952C32.2256 11.2157 31.5416 11.5765 30.8212 11.8131C32.1816 10.9267 33.4945 10.2959 34.87 9.50531L42.6389 5.01563C43.3172 4.63135 43.9623 4.15765 44.6411 3.78313C46.1539 2.94773 47.6696 2.12945 49.1626 1.25607C49.8967 0.826618 50.7711 0.356231 51.5356 0Z" fill="#F8F9FA"/>
+          </svg>
+        </div>
+        <nav class="nav-links">
+          <a href="#">Neora X1</a>
+          <a href="#">Configure</a>
+          <a href="#">Technology</a>
+          <a href="#">Mission</a>
+        </nav>
+      </div>
+      <div class="nav-cta-wrap">
+        <a class="nav-phone" href="tel:18005550199">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L19 17l3 2v3a2 2 0 0 1-2.2 2A18 18 0 0 1 3 6.2 2 2 0 0 1 5 4z"/></svg>
+          1-800-555-0199
+        </a>
+        <button class="nav-cta" type="button" data-book>Book a Test Drive</button>
+      </div>
+    </div>
+  </header>
+</div>
+
+<main class="track" id="track">
+  <div class="stage" id="stage">
+    <video class="bg-video" id="video" muted playsinline preload="auto" poster="poster.jpg"></video>
+
+    <!-- blackout group -->
+    <div class="blackout" id="blackout">
+      <div class="blk-grad"></div>
+      <div class="blk-grad is-solid"></div>
+      <div class="blk-grad"></div>
+      <div class="blk-blur"></div>
+      <div class="blk-grad-bottom"></div>
+    </div>
+
+    <!-- top-anchored design surface: headline + section-2 title -->
+    <div class="design" id="design">
+      <!-- section 1 headline (top-anchored) -->
+      <div class="s1-top" id="s1top">
+        <h1 class="headline"><span class="grad">The future has </span><span class="ital">Arrived.</span><br><span class="grad">Drive it Today</span></h1>
+      </div>
+
+      <!-- section 2 title (top-anchored) -->
+      <div class="s2-title" id="s2title">
+        <h2 class="s2-h">Trusted<br>by <span class="ital">Innovators</span></h2>
+      </div>
+      <div class="s2-right" id="s2right">
+        <p class="s2-right-h">Built on Trust and Innovation</p>
+        <p class="s2-right-p">From daily drives to remarkable trips, Neora is the choice for drivers seeking innovation, reliability, and comfort.</p>
+      </div>
+    </div>
+
+    <!-- section 1 bottom block: always 100px above the screen bottom -->
+    <div class="s1-bottom-scale">
+      <div class="s1-bottom" id="s1bottom">
+        <div class="s1-left">
+          <h2 class="s1-meet">Meet<br>Neora <span class="x1">X1</span></h2>
+          <p class="s1-desc">— presenting our advanced vehicle, set to elevate performance and sustainability standards.</p>
+        </div>
+        <div class="s1-actions">
+          <button class="s1-btn s1-btn-ghost" type="button" onclick="var c=document.getElementById('configurator');if(c)c.scrollIntoView({behavior:'smooth'});">Configurator</button>
+          <button class="s1-btn s1-btn-fill" type="button">Explore Neora X1
+            <svg viewBox="0 0 24 8" fill="none" aria-hidden="true"><path d="M0 4h21.5M18.5 1l3 3-3 3" stroke="#F8F9FA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="s1-preview">
+          <div class="s1-preview-card">
+            <div class="s1-preview-inner" data-img="hero-preview.png">
+              <img src="hero-preview.png" alt="" onerror="this.closest('.s1-preview-inner').classList.add('is-empty')">
+              <button class="s1-play" type="button" aria-label="Play preview">
+                <svg viewBox="0 0 24 24" fill="#F8F9FA" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- section 2 metrics: bottom-anchored, always visible -->
+    <div class="metrics" id="metrics">
+      <div class="card"><p class="m-val">50,000+</p><p class="m-label">Vehicles delivered</p></div>
+      <div class="card"><p class="m-val">98%</p><p class="m-label">Customer satisfaction</p></div>
+      <div class="card"><p class="m-val">25</p><p class="m-label">Countries Represented</p></div>
+      <div class="card"><p class="m-val">Top choice</p><p class="m-label">for Premium EV Enthusiasts</p></div>
+    </div>
+  </div>
+</main>
+
+<!-- ====== Neora X1 — feature section ====== -->
+<section class="feat">
+  <div class="feat-design">
+    <div class="feat-bg" data-img="neora-x1-feature.png">
+      <img src="neora-x1-feature.png" alt="Neora X1" onerror="this.closest('.feat-bg').classList.add('is-empty')">
+    </div>
+    <div class="feat-right">
+      <p class="feat-desc">X1 model merges electric performance with smart technology and safety.</p>
+    </div>
+    <div class="feat-actions">
+      <button class="feat-btn feat-btn-fill" type="button" data-book>Book a Test Drive</button>
+      <button class="feat-btn feat-btn-ghost" type="button" onclick="var c=document.getElementById('configurator');if(c)c.scrollIntoView({behavior:'smooth'});">Configurator</button>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Section 3 — Find your Perfect Match (Neora S1 configurator) ====== -->
+<section class="s3" id="configurator">
+  <div class="s3-design">
+    <div class="s3-glow"></div>
+    <div class="s3-platform"></div>
+
+    <!-- car: single model (Neora X1) — drop neora-x1-{colour}.png into the repo -->
+    <div class="s3-car" id="s3car" data-missing="neora-x1-phantom-black.png">
+      <img class="s3-car-img" id="s3carImgA" alt="Neora X1">
+      <img class="s3-car-img" id="s3carImgB" alt="">
+    </div>
+    <div class="s3-360">360°</div>
+    <div class="s3-fade"></div>
+
+    <!-- characteristics toggle -->
+    <div class="s3-char" id="s3charWrap">
+      <button class="s3-char-toggle" id="s3charBtn" type="button" aria-expanded="false" aria-label="Characteristics">
+        <span class="s3-char-label">Characteristics</span>
+        <svg class="s3-char-dots" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="8.5" cy="8.5" r="1.7"/><circle cx="15.5" cy="8.5" r="1.7"/><circle cx="8.5" cy="15.5" r="1.7"/><circle cx="15.5" cy="15.5" r="1.7"/></svg>
+      </button>
+      <div class="s3-char-card">
+        <div class="s3-char-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>
+          <div class="s3-char-txt"><p class="s3-char-val"><b>15</b><span> min</span></p><p class="s3-char-lab">Charge from 20% to 80%</p></div>
+        </div>
+        <div class="s3-char-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6a4 4 0 0 0 0-8H10a4 4 0 0 1 0-8h6"/></svg>
+          <div class="s3-char-txt"><p class="s3-char-val"><b>820</b><span> km</span></p><p class="s3-char-lab">Maximum driving range</p></div>
+        </div>
+        <div class="s3-char-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 14a8 8 0 0 1 8-8M12 14l4-4M5 18a9 9 0 1 1 14 0"/></svg>
+          <div class="s3-char-txt"><p class="s3-char-val"><b>2.9</b><span> sec</span></p><p class="s3-char-lab">0–100 km/h acceleration</p></div>
+        </div>
+        <div class="s3-char-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>
+          <div class="s3-char-txt"><p class="s3-char-val"><b>1,200</b><span> hp</span></p><p class="s3-char-lab">Dual-motor performance system</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- heading -->
+    <div class="s3-title">
+      <h2 class="s3-h">Find your <span class="ital">Perfect Match</span></h2>
+      <p class="s3-sub">Explore our complete lineup in 360°. Rotate, customize, and compare every model.</p>
+    </div>
+
+    <!-- configurator -->
+    <div class="s3-config">
+      <div class="s3-tabs" id="s3tabs">
+        <div class="s3-tab active">Colour</div>
+        <div class="s3-tab">Interior</div>
+        <div class="s3-tab">Engine</div>
+        <div class="s3-tab">Wheels</div>
+      </div>
+
+      <div class="s3-panel">
+        <!-- Colour -->
+        <div class="s3-pane is-active" data-pane="colour">
+          <div class="s3-swatches">
+            <button class="s3-opt s3-swatch selected" type="button" style="--c:#0a0a0a" data-opt="phantom-black" data-name="Phantom Black" data-price="0" aria-label="Phantom Black"></button>
+            <button class="s3-opt s3-swatch" type="button" style="--c:#fafbff" data-opt="titanium-white" data-name="Titanium White" data-price="0" aria-label="Titanium White"></button>
+            <button class="s3-opt s3-swatch" type="button" style="--c:#a3a5ab" data-opt="frost-platinum" data-name="Frost Platinum" data-price="0" aria-label="Frost Platinum"></button>
+            <button class="s3-opt s3-swatch" type="button" style="--c:#cb0e17" data-opt="metallic-cherry" data-name="Metallic Cherry" data-price="0" aria-label="Metallic Cherry"></button>
+            <button class="s3-opt s3-swatch" type="button" style="--c:#191c0d" data-opt="olive-green" data-name="Olive Green" data-price="0" aria-label="Olive Green"></button>
+            <button class="s3-opt s3-swatch" type="button" style="--c:#070b1a" data-opt="navy-blue" data-name="Navy Blue" data-price="0" aria-label="Navy Blue"></button>
+          </div>
+          <p class="s3-color"><span>Color:</span><span class="s3-optname">Phantom Black</span></p>
+        </div>
+
+        <!-- Interior -->
+        <div class="s3-pane" data-pane="interior">
+          <div class="s3-swatches">
+            <button class="s3-opt s3-swatch selected" type="button" style="--c:#1a1512" data-opt="black-leather" data-name="Black Leather" data-price="0" aria-label="Black Leather"><span class="s3-sw-price"></span></button>
+            <button class="s3-opt s3-swatch" type="button" style="--c:#e7ddc8" data-opt="cream-leather" data-name="Cream Leather" data-price="4500" aria-label="Cream Leather"><span class="s3-sw-price"></span></button>
+            <button class="s3-opt s3-swatch" type="button" style="--c:#875a38" data-opt="tan-leather" data-name="Tan Leather" data-price="4500" aria-label="Tan Leather"><span class="s3-sw-price"></span></button>
+            <button class="s3-opt s3-swatch" type="button" style="--c:#2b2e34" data-opt="carbon-textile" data-name="Carbon Textile" data-price="2500" aria-label="Carbon Textile"><span class="s3-sw-price"></span></button>
+            <button class="s3-opt s3-swatch" type="button" style="--c:#6d1820" data-opt="red-leather" data-name="Red Leather" data-price="6000" aria-label="Red Leather"><span class="s3-sw-price"></span></button>
+          </div>
+          <p class="s3-color"><span>Interior:</span><span class="s3-optname">Black Leather</span></p>
+        </div>
+
+        <!-- Engine -->
+        <div class="s3-pane" data-pane="engine">
+          <div class="s3-rows">
+            <button class="s3-opt s3-row selected" type="button" data-opt="standard" data-name="Standard Range" data-price="0">
+              <span class="s3-row-info"><span class="s3-row-name">Standard Range</span><span class="s3-row-sub">Single Motor</span></span><span class="s3-row-price"></span></button>
+            <button class="s3-opt s3-row" type="button" data-opt="long-range" data-name="Long Range" data-price="12000">
+              <span class="s3-row-info"><span class="s3-row-name">Long Range</span><span class="s3-row-sub">Dual Motor</span></span><span class="s3-row-price"></span></button>
+            <button class="s3-opt s3-row" type="button" data-opt="performance" data-name="Performance" data-price="20000">
+              <span class="s3-row-info"><span class="s3-row-name">Performance</span><span class="s3-row-sub">Dual Motor</span></span><span class="s3-row-price"></span></button>
+            <button class="s3-opt s3-row" type="button" data-opt="track" data-name="Track" data-price="35000">
+              <span class="s3-row-info"><span class="s3-row-name">Track</span><span class="s3-row-sub">Tri-Motor</span></span><span class="s3-row-price"></span></button>
+          </div>
+          <p class="s3-color"><span>Engine:</span><span class="s3-optname">Standard Range</span></p>
+        </div>
+
+        <!-- Wheels -->
+        <div class="s3-pane" data-pane="wheels">
+          <div class="s3-rows">
+            <button class="s3-opt s3-row selected" type="button" data-opt="aero-19" data-name="19&quot; Aero" data-price="0">
+              <span class="s3-row-info"><span class="s3-row-name">19&quot; Aero</span><span class="s3-row-sub">Standard</span></span><span class="s3-row-price"></span></button>
+            <button class="s3-opt s3-row" type="button" data-opt="sport-20" data-name="20&quot; Sport" data-price="2000">
+              <span class="s3-row-info"><span class="s3-row-name">20&quot; Sport</span><span class="s3-row-sub">Alloy</span></span><span class="s3-row-price"></span></button>
+            <button class="s3-opt s3-row" type="button" data-opt="turbine-21" data-name="21&quot; Turbine" data-price="3500">
+              <span class="s3-row-info"><span class="s3-row-name">21&quot; Turbine</span><span class="s3-row-sub">Forged Alloy</span></span><span class="s3-row-price"></span></button>
+            <button class="s3-opt s3-row" type="button" data-opt="forged-22" data-name="22&quot; Forged" data-price="5500">
+              <span class="s3-row-info"><span class="s3-row-name">22&quot; Forged</span><span class="s3-row-sub">Forged Alloy</span></span><span class="s3-row-price"></span></button>
+          </div>
+          <p class="s3-color"><span>Wheels:</span><span class="s3-optname">19&quot; Aero</span></p>
+        </div>
+
+        <div class="s3-panel-bottom">
+          <div class="s3-total-wrap">
+            <div class="s3-divider"></div>
+            <div class="s3-total">
+              <span class="s3-total-label">Total:</span>
+              <span class="s3-total-val"><span>€</span><span id="s3total">300 000</span></span>
+            </div>
+          </div>
+          <button class="s3-reserve" type="button" data-book>
+            Reserve this configuration
+            <svg viewBox="0 0 24 8" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M0 4h21.5M18.5 1l3 3-3 3" stroke="#08090A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Section 6 — We have Nothing to Hide (x-ray reveal) ====== -->
+<section class="s6">
+  <div class="s6-design">
+    <div class="s6-floor"></div>
+
+    <div class="s6-car" id="s6car" data-img="car-full.png + car-cutted.png">
+      <img class="s6-cut" src="car-cutted.png" alt="" onerror="this.style.display='none'">
+      <img class="s6-full" src="car-full.png" alt=""
+           onerror="this.style.display='none';this.closest('.s6-car').classList.add('is-empty')">
+    </div>
+
+    <div class="s6-fade"></div>
+
+    <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+      <filter id="glass" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.016" numOctaves="2" seed="7" result="noise"/>
+        <feGaussianBlur in="noise" stdDeviation="1.6" result="softNoise"/>
+        <feDisplacementMap in="SourceGraphic" in2="softNoise" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </svg>
+
+    <svg class="s6-lines" viewBox="0 0 1920 1158" fill="none" aria-hidden="true">
+      <g stroke="rgba(255,255,255,0.3)" stroke-width="1.5">
+        <line class="s6-line" style="--d:0s"   pathLength="1" x1="943"  y1="552" x2="715"  y2="357"/>
+        <line class="s6-line" style="--d:.5s"  pathLength="1" x1="408"  y1="569" x2="244"  y2="488"/>
+        <line class="s6-line" style="--d:1s"   pathLength="1" x1="1567" y1="595" x2="1739" y2="431"/>
+        <line class="s6-line" style="--d:1.5s" pathLength="1" x1="1090" y1="846" x2="1259" y2="1002"/>
+        <line class="s6-line" style="--d:2s"   pathLength="1" x1="537"  y1="856" x2="681"  y2="1012"/>
+      </g>
+      <g fill="#f8f9fa">
+        <circle class="s6-dot" style="--d:0s"   cx="943"  cy="552" r="3.5"/>
+        <circle class="s6-dot" style="--d:.5s"  cx="408"  cy="569" r="3.5"/>
+        <circle class="s6-dot" style="--d:1s"   cx="1567" cy="595" r="3.5"/>
+        <circle class="s6-dot" style="--d:1.5s" cx="1090" cy="846" r="3.5"/>
+        <circle class="s6-dot" style="--d:2s"   cx="537"  cy="856" r="3.5"/>
+      </g>
+    </svg>
+
+    <div class="s6-label" style="left:598px;top:331px;--d:0s"><span>Ergonomic seats</span></div>
+    <div class="s6-label" style="left:140px;top:462px;--d:.5s"><span>Instant Torque</span></div>
+    <div class="s6-label" style="left:1624px;top:405px;--d:1s"><span>Capacious trunk</span></div>
+    <div class="s6-label" style="left:1129px;top:976px;--d:1.5s"><span>Solid-State Battery</span></div>
+    <div class="s6-label" style="left:564px;top:986px;--d:2s"><span>22&quot; Aero Wheels</span></div>
+
+    <div class="s6-title">
+      <h2 class="s6-h">We have <span class="ital">Nothing to Hide</span></h2>
+      <p class="s6-sub">Explore our complete lineup in 360°. Rotate, customize, and compare every model.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Section 4 — Technology Designed Around You (expanding cards) ====== -->
+<section class="s4">
+  <div class="s4-design">
+    <div class="s4-title">
+      <h2 class="s4-h">Technology Designed<br><span class="ital">Around You</span></h2>
+      <p class="s4-sub">Every detail is engineered to enhance performance, safety, and comfort.<br>Advanced technology works seamlessly in the background, creating an effortless driving experience.</p>
+    </div>
+
+    <div class="s4-row" id="s4row">
+      <article class="t-card" tabindex="0">
+        <div class="t-panel"><div class="t-panel-inner">
+          <p class="t-desc">Take full control of your Neora from anywhere with an intuitive mobile app. Whether you need to adjust the climate, manage charging, navigate your route, or check diagnostics, everything is just a tap away, making your driving experience more convenient and connected.</p>
+        </div></div>
+        <div class="t-media" data-img="tech-connected.png">
+          <img src="tech-connected.png" alt="" onerror="this.closest('.t-media').classList.add('is-empty')">
+          <div class="t-dim"></div><div class="t-grad"></div>
+        </div>
+        <h3 class="t-title">Connected Ecosystem</h3>
+      </article>
+
+      <article class="t-card" tabindex="0">
+        <div class="t-panel"><div class="t-panel-inner">
+          <p class="t-desc">Our advanced energy density technology leads the industry, offering impressive range and fast charging. Get up to 820 km on a single charge and enjoy 80% battery replenishment in just 15 minutes for a smooth driving experience.</p>
+        </div></div>
+        <div class="t-media" data-img="tech-battery.png">
+          <img src="tech-battery.png" alt="" onerror="this.closest('.t-media').classList.add('is-empty')">
+          <div class="t-dim"></div><div class="t-grad"></div>
+        </div>
+        <h3 class="t-title">Next-Generation Battery</h3>
+      </article>
+
+      <article class="t-card" tabindex="0">
+        <div class="t-panel"><div class="t-panel-inner">
+          <p class="t-desc">With industry-leading energy density, our technology ensures you enjoy an extended driving range and rapid charging capabilities. Travel up to 820 km on a single charge, and recharge to 80% in just 15 minutes, making long journeys and quick stops hassle-free.</p>
+        </div></div>
+        <div class="t-media" data-img="tech-driving.png">
+          <img src="tech-driving.png" alt="" onerror="this.closest('.t-media').classList.add('is-empty')">
+          <div class="t-dim"></div><div class="t-grad"></div>
+        </div>
+        <h3 class="t-title">Intelligent Driving</h3>
+      </article>
+
+      <article class="t-card" tabindex="0">
+        <div class="t-panel"><div class="t-panel-inner">
+          <p class="t-desc">Experience a sleek, minimalist design that seamlessly integrates sustainable materials with an advanced digital cockpit. This innovative cockpit is designed to blend into your environment, becoming virtually invisible when not in use, ensuring a clean and uncluttered space.</p>
+        </div></div>
+        <div class="t-media" data-img="tech-interior.png">
+          <img src="tech-interior.png" alt="" onerror="this.closest('.t-media').classList.add('is-empty')">
+          <div class="t-dim"></div><div class="t-grad"></div>
+        </div>
+        <h3 class="t-title">Premium Interior</h3>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Section 5 — Built for a Cleaner Future ====== -->
+<section class="s5">
+  <div class="s5-design">
+    <div class="s5-ambient" data-img="cleaner-future.png" aria-hidden="true">
+      <img class="s5-ambient-bg" src="cleaner-future.png" alt=""
+           onerror="this.style.display='none';this.closest('.s5-ambient').classList.add('is-empty')">
+      <div class="s5-ambient-fade"></div>
+    </div>
+    <div class="s5-panel">
+      <div class="s5-panel-overlay"></div>
+
+      <div class="s5-card">
+        <div class="s5-head">
+          <h2 class="s5-h">Built for a <span class="ital">Cleaner Future</span></h2>
+          <div class="s5-para">
+            <p>We believe mobility should move people forward without moving the planet backward.</p>
+            <p>Creating electric vehicles isn't enough. We're building a future where innovation, sustainability, and exceptional design exist in perfect balance.</p>
+          </div>
+        </div>
+        <div class="s5-battery">
+          <div class="s5-battery-inner" data-img="neora-batteries.png">
+            <img src="neora-batteries.png" alt="" onerror="this.closest('.s5-battery-inner').classList.add('is-empty')">
+            <div class="s5-battery-cta">
+              <div class="s5-battery-pill">Neora batteries<br>manufacturing</div>
+              <button class="s5-battery-play" type="button" aria-label="Play video">
+                <svg viewBox="0 0 24 24" fill="#F8F9FA" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="s5-bookbtn" type="button" data-book>Book a Test Drive</button>
+
+      <div class="s5-renew">
+        <p class="s5-renew-num">100%</p>
+        <p class="s5-renew-lab">Renewable Production</p>
+      </div>
+
+      <div class="s5-stats">
+        <div class="s5-stat"><p class="s5-stat-num">95%</p><p class="s5-stat-lab">Safe Battery Materials</p></div>
+        <div class="s5-stat"><p class="s5-stat-num">0 g/km</p><p class="s5-stat-lab">Driving Emissions</p></div>
+        <div class="s5-stat"><p class="s5-stat-num">35 dB</p><p class="s5-stat-lab">Low Noise Level</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Section 7 — Test Drive Booking Form ====== -->
+<section class="s7">
+  <div class="s7-design">
+    <div class="s7-bg" data-img="form-car.png">
+      <img src="form-car.png" alt="" onerror="this.closest('.s7-bg').classList.add('is-empty')">
+    </div>
+    <p class="s7-tagline">Performance. Electric.<br>Evolution.</p>
+    <form class="s7-card" onsubmit="return false;">
+      <div class="s7-head">
+        <div class="s7-titlewrap">
+          <h2 class="s7-h">Test Drive<br><span class="l2">Booking Form</span></h2>
+          <p class="s7-sub">Schedule a personal viewing and test drive with one of our specialists.</p>
+        </div>
+        <div class="s7-fields">
+          <div class="s7-field">
+            <label class="s7-label" for="f-email">Email Address</label>
+            <input class="s7-input" id="f-email" type="email" placeholder="you@email.com">
+          </div>
+          <div class="s7-field">
+            <label class="s7-label" for="f-name">Full name</label>
+            <input class="s7-input" id="f-name" type="text" placeholder="Your name">
+          </div>
+          <div class="s7-row">
+            <div class="s7-field">
+              <label class="s7-label" for="f-phone">Phone Number</label>
+              <input class="s7-input" id="f-phone" type="tel" placeholder="Your number">
+            </div>
+            <div class="s7-field">
+              <label class="s7-label" for="f-date">Preferred Date</label>
+              <div class="s7-datewrap" id="f-datewrap">
+                <input class="s7-input" id="f-date" type="text" placeholder="Pick a date" readonly>
+                <button class="s7-cal-btn" id="f-dateicon" type="button" aria-label="Open calendar" aria-expanded="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>
+                </button>
+                <div class="s7-cal" id="f-cal" role="dialog" aria-label="Choose date">
+                  <div class="s7-cal-head">
+                    <button class="s7-cal-nav s7-cal-prev" id="f-cal-prev" type="button" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+                    <span class="s7-cal-title" id="f-cal-title">Month YYYY</span>
+                    <button class="s7-cal-nav s7-cal-next" id="f-cal-next" type="button" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+                  </div>
+                  <div class="s7-cal-grid" id="f-cal-grid"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="s7-submit" type="submit">Book a Viewing</button>
+    </form>
+  </div>
+</section>
+
+<!-- ====== Footer ====== -->
+<footer class="footer">
+  <div class="footer-design">
+    <div class="footer-divider"></div>
+    <div class="footer-top">
+      <p class="footer-logo">Neora</p>
+      <button class="footer-book" type="button" data-book>Book a Test Drive</button>
+    </div>
+    <div class="footer-main">
+      <div class="footer-brand">
+        <p class="footer-tagline">Performance. Electric. Evolution.</p>
+        <div class="footer-contacts">
+          <a class="footer-email" href="mailto:info@neora.com">info@neora.com</a>
+          <p class="footer-phone">1-800-555-0199</p>
+        </div>
+      </div>
+      <div class="footer-grid">
+        <div class="footer-col">
+          <p class="footer-coltitle">Models</p>
+          <div class="footer-links"><a href="#">Neora X1</a><a href="#">Neora S1</a><a href="#">Neora C1</a></div>
+        </div>
+        <div class="footer-col">
+          <p class="footer-coltitle">Company</p>
+          <div class="footer-links"><a href="#">About Neora</a><a href="#">Sustainability</a><a href="#">Innovation</a></div>
+        </div>
+        <div class="footer-col">
+          <p class="footer-coltitle">Support</p>
+          <div class="footer-links"><a href="#">Charging</a><a href="#">Service</a><a href="#">Charging Map</a><a href="#">Contact</a></div>
+        </div>
+        <div class="footer-col is-legal">
+          <p class="footer-coltitle">Legal</p>
+          <div class="footer-links"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a><a href="#">Recall Info</a></div>
+        </div>
+      </div>
+      <div class="footer-soc">
+        <p class="footer-soctitle">Social media</p>
+        <div class="footer-social">
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+          <a href="#" aria-label="Twitter"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 5.9c-.7.3-1.5.5-2.3.6.8-.5 1.5-1.3 1.8-2.3-.8.5-1.7.8-2.6 1a4 4 0 0 0-6.9 3.7A11.4 11.4 0 0 1 3.8 4.5a4 4 0 0 0 1.2 5.4c-.6 0-1.2-.2-1.8-.5v.1a4 4 0 0 0 3.2 4 4 4 0 0 1-1.8.1 4 4 0 0 0 3.7 2.8A8 8 0 0 1 2 18.1a11.3 11.3 0 0 0 6.1 1.8c7.4 0 11.4-6.1 11.4-11.4v-.5c.8-.6 1.5-1.3 2-2.1z"/></svg></a>
+          <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="3.5"/><path d="M10 9.2v5.6l5-2.8z" fill="currentColor" stroke="none"/></svg></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-line"></div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 Neora Motors. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ====== Booking modal (opened by every "Book a Test Drive" / Reserve button) ====== -->
+<div class="bookmodal" id="bookModal" aria-hidden="true">
+  <div class="bookmodal-backdrop" data-book-close></div>
+  <div class="bookmodal-dialog" role="dialog" aria-modal="true" aria-label="Test Drive Booking Form">
+    <button class="bookmodal-close" type="button" data-book-close aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <form class="s7-card" onsubmit="return false;">
+      <div class="s7-head">
+        <div class="s7-titlewrap">
+          <h2 class="s7-h">Test Drive<br><span class="l2">Booking Form</span></h2>
+          <p class="s7-sub">Schedule a personal viewing and test drive with one of our specialists.</p>
+        </div>
+        <div class="s7-fields">
+          <div class="s7-field">
+            <label class="s7-label" for="bf-email">Email Address</label>
+            <input class="s7-input" id="bf-email" type="email" placeholder="you@email.com">
+          </div>
+          <div class="s7-field">
+            <label class="s7-label" for="bf-name">Full name</label>
+            <input class="s7-input" id="bf-name" type="text" placeholder="Your name">
+          </div>
+          <div class="s7-row">
+            <div class="s7-field">
+              <label class="s7-label" for="bf-phone">Phone Number</label>
+              <input class="s7-input" id="bf-phone" type="tel" placeholder="Your number">
+            </div>
+            <div class="s7-field">
+              <label class="s7-label" for="bf-date">Preferred Date</label>
+              <div class="s7-datewrap">
+                <input class="s7-input" id="bf-date" type="text" placeholder="Pick a date" readonly>
+                <button class="s7-cal-btn" type="button" aria-label="Open calendar" aria-expanded="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>
+                </button>
+                <div class="s7-cal" role="dialog" aria-label="Choose date">
+                  <div class="s7-cal-head">
+                    <button class="s7-cal-nav s7-cal-prev" type="button" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+                    <span class="s7-cal-title">Month YYYY</span>
+                    <button class="s7-cal-nav s7-cal-next" type="button" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+                  </div>
+                  <div class="s7-cal-grid"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="s7-submit" type="submit">Book a Viewing</button>
+    </form>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- video source: prefer the optimized local copy, fall back to the
+     original on GitHub if the local file isn't present (e.g. in preview). ---- */
+  var SOURCES = [
+    "./neora-video.mp4",
+    "https://raw.githubusercontent.com/Vkadema/Website_Design_Neora/main/neora-video.mp4"
+  ];
+
+  /* ---- choreography constants ---- */
+  var FREEZE      = 7.9;    // intro stops here
+  var END_SAFE    = 9.96;   // last visible frame (avoid clamping past duration)
+  var SCRUB_END_P = 0.40;   // progress at which the video reaches the last frame
+  // reveal now happens DURING playback, finishing before the freeze.
+  var NAV_LEAD    = 2.0;    // header starts revealing this many seconds before the freeze (earliest)
+  var NAV_DUR     = 0.85;   // header reveal duration (in video seconds)
+  var BODY_LEAD   = 1.35;   // blackout / headline / bottom block start this long before the freeze
+  var BODY_DUR    = 0.95;   // their reveal duration (in video seconds)
+  var BLK_OUT     = [0.28, 0.40]; // blackout fades out across this scroll window
+  var TITLE_IN    = [0.40, 0.50];
+  var CARD_STARTS = [0.42, 0.46, 0.50, 0.54];
+  var CARD_WIN    = 0.06;
+
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var V       = document.getElementById("video");
+  var track   = document.getElementById("track");
+  var nav      = document.getElementById("nav");
+  var blackout = document.getElementById("blackout");
+  var s1top    = document.getElementById("s1top");
+  var s1bottom = document.getElementById("s1bottom");
+  var s2title  = document.getElementById("s2title");
+  var s2right  = document.getElementById("s2right");
+  var cards    = Array.prototype.slice.call(document.querySelectorAll(".card"));
+
+  var phase = "intro"; // "intro" -> "post"
+  var revealStart = 0;
+  var lastSeek = -1;
+  var si = 0;
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function smoothstep(a,b,x){ x = clamp((x-a)/(b-a),0,1); return x*x*(3-2*x); }
+
+  /* scale the 1920-wide design surfaces to the viewport width (shared via :root) */
+  function fit(){
+    document.documentElement.style.setProperty("--scale", (window.innerWidth/1920).toString());
+  }
+  fit();
+  window.addEventListener("resize", fit, {passive:true});
+
+  /* progress through the sticky track, 0..1 */
+  function getP(){
+    var r = track.getBoundingClientRect();
+    var total = track.offsetHeight - window.innerHeight;
+    if(total <= 0) return 0;
+    return clamp(-r.top/total, 0, 1);
+  }
+
+  function freezeNow(now){
+    phase = "post";
+    try{ V.pause(); }catch(e){}
+    V.playbackRate = 1;
+    try{ V.currentTime = FREEZE; }catch(e){}
+    revealStart = now;
+  }
+
+  /* video source handling with graceful fallback */
+  function applySrc(){ V.src = SOURCES[si]; }
+  V.addEventListener("error", function(){
+    if(si < SOURCES.length - 1){
+      si++;
+      applySrc();
+      V.load();
+      if(phase === "intro" && !reduce){ var p = V.play(); if(p && p.catch) p.catch(function(){}); }
+    }
+  });
+  applySrc();
+
+  function startIntro(){
+    if(reduce){ freezeNow(performance.now()); return; }
+    var p = V.play();
+    if(p && p.catch){ p.catch(function(){ freezeNow(performance.now()); }); }
+  }
+  if(V.readyState >= 2){ startIntro(); }
+  else { V.addEventListener("loadeddata", startIntro, {once:true}); }
+
+  /* safety: if nothing has played after a moment, reveal anyway */
+  setTimeout(function(){ if(phase === "intro" && (V.paused || V.currentTime === 0) && reduce === false && V.readyState < 2){ /* wait for fallback */ } }, 3000);
+
+  function frame(now){
+    var p = getP();
+
+    if(phase === "intro"){
+      if(reduce){ freezeNow(now); }
+      else {
+        if(V.currentTime >= FREEZE - 0.012){ freezeNow(now); }   // full speed, then a clean stop
+        else if(p > 0.002){ freezeNow(now); }                    // user scrolled during intro -> skip ahead
+      }
+    }
+
+    // reveal clock: during intro it tracks the video's currentTime so the UI fades in
+    // a bit BEFORE the freeze; in post it's pinned to FREEZE so scrubbing won't change it.
+    var rt = (phase === "post") ? FREEZE : (V.currentTime || 0);
+    // header reveals first (largest lead); blackout/text/buttons follow slightly later.
+    var navF  = reduce ? 1 : smoothstep(FREEZE - NAV_LEAD,  FREEZE - NAV_LEAD  + NAV_DUR,  rt);
+    var bodyF = reduce ? 1 : smoothstep(FREEZE - BODY_LEAD, FREEZE - BODY_LEAD + BODY_DUR, rt);
+
+    // header intro: mask reveal (top -> bottom) on the pill itself.
+    // No opacity on .nav: opacity<1 on the ancestor would mute the pill's glass blur.
+    nav.style.setProperty("--nav-rev", (navF*116).toFixed(1) + "%");
+
+    // blackout: fades in with the headline/bottom group (bodyF), settling at 80% overlay in
+    // section 2; the hero-only solid layer + bottom vignette fade fully out by section 2.
+    var blkFade = smoothstep(BLK_OUT[0], BLK_OUT[1], p);
+    blackout.style.setProperty("--blk-a", (bodyF * (1 - 0.2*blkFade)).toFixed(3));
+    blackout.style.setProperty("--blk-solid-a", (bodyF * (1 - blkFade)).toFixed(3));
+
+    // section 1 text + buttons: fade+rise IN on reveal, then SCROLL UP off the page as you
+    // scroll (no exit fade). Both blocks share one translateY → rigid, like the page scrolling:
+    // the top headline leaves first, the bottom block (buttons) leaves last.
+    var s1Exit = clamp(p / 0.22, 0, 1);                 // 0..1 across the first 22% of the track
+    var s1ExitPx = s1Exit * 1180;                        // slide-up distance (design px, ~one screen)
+    var s1op = bodyF;                                    // entrance fade-in only; no fade-out
+    var s1ty = "translateY(" + ((1-bodyF)*16 - s1ExitPx).toFixed(2) + "px)";
+    s1top.style.opacity = s1op.toFixed(3);
+    s1top.style.transform = s1ty;
+    s1bottom.style.opacity = s1op.toFixed(3);
+    s1bottom.style.transform = s1ty;
+    s1bottom.style.pointerEvents = (s1op > 0.05 && s1Exit < 0.95) ? "auto" : "none";
+
+    // section 2 title
+    var tF = reduce ? (p > TITLE_IN[0] ? 1 : 0) : smoothstep(TITLE_IN[0], TITLE_IN[1], p);
+    s2title.style.opacity = tF;
+    s2title.style.transform = "translateY(" + ((1-tF)*24).toFixed(2) + "px)";
+    s2title.style.pointerEvents = tF > 0.05 ? "auto" : "none";
+    if(s2right){
+      s2right.style.opacity = tF;
+      s2right.style.transform = "translateY(" + ((1-tF)*24).toFixed(2) + "px)";
+      s2right.style.pointerEvents = tF > 0.05 ? "auto" : "none";
+    }
+
+    // metric cards: one after another, left -> right
+    for(var i=0;i<cards.length;i++){
+      var f = reduce ? (p > CARD_STARTS[i] ? 1 : 0)
+                     : smoothstep(CARD_STARTS[i], CARD_STARTS[i]+CARD_WIN, p);
+      cards[i].style.opacity = f;
+      cards[i].style.transform = "translateY(" + ((1-f)*28).toFixed(2) + "px)";
+    }
+
+    // sticky-scroll scrub: 7.9s -> last frame across the track
+    if(phase === "post"){
+      var sp = clamp(p / SCRUB_END_P, 0, 1);
+      var t = FREEZE + sp*(END_SAFE - FREEZE);
+      if(Math.abs(t - lastSeek) > 0.008){
+        try{ V.currentTime = t; lastSeek = t; }catch(e){}
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* ---- sticky header: hide when scrolling down, reveal when scrolling up ---- */
+  var lastY = window.pageYOffset || 0;
+  var navHidden = false;
+  var navTick = false;
+  function onScroll(){
+    var y = window.pageYOffset || 0;
+    var dy = y - lastY;
+    if(Math.abs(dy) > 4){
+      if(y <= 140 || dy > 0){           // near the top OR scrolling down -> show
+        if(navHidden){ nav.classList.remove("is-hidden"); navHidden = false; }
+      } else {                          // scrolling up -> hide
+        if(!navHidden){ nav.classList.add("is-hidden"); navHidden = true; }
+      }
+      lastY = y;
+    }
+    navTick = false;
+  }
+  window.addEventListener("scroll", function(){
+    if(!navTick){ navTick = true; requestAnimationFrame(onScroll); }
+  }, {passive:true});
+})();
+
+/* ---- section 3: configurator (tabs, options, price, car colour) ---- */
+(function(){
+  "use strict";
+
+  var carBox = document.getElementById("s3car");
+  var imgs   = [document.getElementById("s3carImgA"), document.getElementById("s3carImgB")];
+  var front  = 0;
+  var BASE   = 300000;
+  var model  = "neora-x1";
+  var colour = "phantom-black";
+
+  var sel = {
+    colour:   { name:"Phantom Black",  price:0 },
+    interior: { name:"Black Leather",  price:0 },
+    engine:   { name:"Standard Range", price:0 },
+    wheels:   { name:"19\" Aero",      price:0 }
+  };
+
+  function fmt(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
+  var totalEl = document.getElementById("s3total");
+  function updateTotal(){
+    if(totalEl){ totalEl.textContent = fmt(BASE + sel.interior.price + sel.engine.price + sel.wheels.price); }
+  }
+
+  function fileFor(){ return model + "-" + colour + ".png"; }
+  function updateCar(label){
+    if(!carBox) return;
+    var file = fileFor();
+    var back = imgs[front ^ 1];
+    back.onload = function(){
+      if(label){ back.alt = label; }
+      carBox.classList.remove("is-empty");
+      back.style.opacity = "1";
+      imgs[front].style.opacity = "0";
+      front ^= 1;
+    };
+    back.onerror = function(){
+      carBox.setAttribute("data-missing", file);
+      carBox.classList.add("is-empty");
+      imgs[0].style.opacity = "0";
+      imgs[1].style.opacity = "0";
+    };
+    back.src = file;
+  }
+
+  // each tab's panel has its own selectable options (data-name / data-price / data-opt)
+  var panes = Array.prototype.slice.call(document.querySelectorAll(".s3-pane"));
+  panes.forEach(function(pane){
+    var key = pane.getAttribute("data-pane");
+    var opts = Array.prototype.slice.call(pane.querySelectorAll(".s3-opt"));
+    var nameEl = pane.querySelector(".s3-optname");
+    opts.forEach(function(op){
+      // show how much this option adds to the price (rows: right column; swatches: bottom badge)
+      var pr = parseInt(op.getAttribute("data-price"), 10) || 0;
+      var priceEl = op.querySelector(".s3-row-price, .s3-sw-price");
+      if(priceEl){
+        if(pr > 0){ priceEl.textContent = "+€" + fmt(pr); priceEl.classList.remove("is-free"); }
+        else { priceEl.textContent = "Included"; priceEl.classList.add("is-free"); }
+      }
+      op.addEventListener("click", function(){
+        opts.forEach(function(o){ o.classList.remove("selected"); });
+        op.classList.add("selected");
+        var nm = op.getAttribute("data-name");
+        sel[key] = { name: nm, price: parseInt(op.getAttribute("data-price"), 10) || 0 };
+        if(nameEl){ nameEl.textContent = nm; }
+        if(key === "colour"){ colour = op.getAttribute("data-opt"); updateCar(nm); }
+        updateTotal();
+      });
+    });
+  });
+
+  // tabs -> reveal the matching panel
+  var tabsBox = document.getElementById("s3tabs");
+  if(tabsBox){
+    var tabs = Array.prototype.slice.call(tabsBox.children);
+    var order = ["colour","interior","engine","wheels"];
+    tabs.forEach(function(tab, i){
+      tab.addEventListener("click", function(){
+        tabs.forEach(function(x){ x.classList.remove("active"); });
+        tab.classList.add("active");
+        panes.forEach(function(pn){ pn.classList.toggle("is-active", pn.getAttribute("data-pane") === order[i]); });
+      });
+    });
+  }
+
+  updateTotal();
+  updateCar("Neora X1");
+
+  // characteristics toggle
+  var charBtn = document.getElementById("s3charBtn");
+  var charWrap = document.getElementById("s3charWrap");
+  if(charBtn && charWrap){
+    charBtn.addEventListener("click", function(){
+      var open = charWrap.classList.toggle("is-open");
+      charBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+})();
+
+/* ---- section 4: tap / keyboard support (hover is handled in CSS) ---- */
+(function(){
+  "use strict";
+  var row = document.getElementById("s4row");
+  if(!row) return;
+  var cards = Array.prototype.slice.call(row.querySelectorAll(".t-card"));
+  function openOnly(card){
+    cards.forEach(function(c){ c.classList.toggle("is-open", c === card); });
+  }
+  cards.forEach(function(card){
+    card.addEventListener("click", function(){
+      openOnly(card.classList.contains("is-open") ? null : card);
+    });
+    card.addEventListener("focus", function(){ openOnly(card); });
+    card.addEventListener("keydown", function(e){
+      if(e.key === "Enter" || e.key === " "){ e.preventDefault(); openOnly(card); }
+    });
+  });
+  // tapping/clicking outside the row closes everything
+  document.addEventListener("click", function(e){
+    if(!row.contains(e.target)){ openOnly(null); }
+  });
+})();
+
+/* ---- section 6: x-ray reveal that follows the cursor ---- */
+(function(){
+  "use strict";
+  var car = document.getElementById("s6car");
+  if(!car) return;
+  var full = car.querySelector(".s6-full");
+  if(!full) return;
+
+  function move(pt){
+    var r = car.getBoundingClientRect();
+    var scale = car.offsetWidth ? (r.width / car.offsetWidth) : 1;
+    var x = (pt.clientX - r.left) / scale;
+    var y = (pt.clientY - r.top) / scale;
+    full.style.setProperty("--mx", x.toFixed(1) + "px");
+    full.style.setProperty("--my", y.toFixed(1) + "px");
+  }
+  car.addEventListener("mouseenter", function(e){ car.classList.add("is-xray"); move(e); });
+  car.addEventListener("mousemove", move);
+  car.addEventListener("mouseleave", function(){ car.classList.remove("is-xray"); });
+  // touch: drag the lens with a finger
+  car.addEventListener("touchstart", function(e){ if(e.touches[0]){ car.classList.add("is-xray"); move(e.touches[0]); } }, {passive:true});
+  car.addEventListener("touchmove", function(e){ if(e.touches[0]){ move(e.touches[0]); } }, {passive:true});
+  car.addEventListener("touchend", function(){ car.classList.remove("is-xray"); });
+})();
+
+/* ---- section 6: reveal callouts (dot -> line -> label) when section enters view ---- */
+(function(){
+  "use strict";
+  var s6 = document.querySelector(".s6");
+  if(!s6) return;
+  if(!("IntersectionObserver" in window)){ s6.classList.add("is-revealed"); return; }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ s6.classList.add("is-revealed"); io.disconnect(); }
+    });
+  }, { threshold: 0.3, rootMargin: "0px 0px -22% 0px" });
+  io.observe(s6);
+})();
+
+/* ---- fade-in content for configurator / technology / cleaner-future on scroll ---- */
+(function(){
+  "use strict";
+  var targets = Array.prototype.slice.call(document.querySelectorAll(".s3,.s4"));
+  if(!targets.length) return;
+  if(!("IntersectionObserver" in window)){ targets.forEach(function(t){ t.classList.add("is-in"); }); return; }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add("is-in"); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.25, rootMargin: "0px 0px -28% 0px" });
+  targets.forEach(function(t){ io.observe(t); });
+})();
+
+/* ---- custom date picker — initialised for every .s7-datewrap (inline form + modal) ---- */
+(function(){
+  "use strict";
+  var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var DOW = ["Mo","Tu","We","Th","Fr","Sa","Su"];
+  function sameDay(a,b){ return a && b && a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+
+  function initDatePicker(wrap){
+    var input   = wrap.querySelector(".s7-input");
+    var iconBtn = wrap.querySelector(".s7-cal-btn");
+    var cal     = wrap.querySelector(".s7-cal");
+    var title   = wrap.querySelector(".s7-cal-title");
+    var grid    = wrap.querySelector(".s7-cal-grid");
+    var prevBtn = wrap.querySelector(".s7-cal-prev");
+    var nextBtn = wrap.querySelector(".s7-cal-next");
+    if(!input || !cal || !grid || !title) return;
+
+    var today = new Date(); today.setHours(0,0,0,0);
+    var view = new Date(today.getFullYear(), today.getMonth(), 1);
+    var selected = null;
+
+    function render(){
+      title.textContent = MONTHS[view.getMonth()] + " " + view.getFullYear();
+      grid.textContent = "";
+      DOW.forEach(function(d){
+        var c = document.createElement("div"); c.className = "s7-cal-dow"; c.textContent = d; grid.appendChild(c);
+      });
+      var first = new Date(view.getFullYear(), view.getMonth(), 1);
+      var lead = (first.getDay() + 6) % 7;
+      var start = new Date(first); start.setDate(1 - lead);
+      for(var i=0;i<42;i++){
+        var d = new Date(start.getFullYear(), start.getMonth(), start.getDate()+i);
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "s7-cal-day"; b.textContent = d.getDate();
+        if(d.getMonth() !== view.getMonth()) b.classList.add("is-muted");
+        if(sameDay(d, today)) b.classList.add("is-today");
+        if(sameDay(d, selected)) b.classList.add("is-sel");
+        (function(dd){
+          b.addEventListener("click", function(){
+            selected = dd;
+            input.value = dd.getDate() + " " + MONTHS[dd.getMonth()].slice(0,3) + " " + dd.getFullYear();
+            close();
+          });
+        })(d);
+        grid.appendChild(b);
+      }
+    }
+    function open(){ view = new Date((selected||today).getFullYear(), (selected||today).getMonth(), 1); render(); cal.classList.add("is-open"); if(iconBtn) iconBtn.setAttribute("aria-expanded","true"); }
+    function close(){ cal.classList.remove("is-open"); if(iconBtn) iconBtn.setAttribute("aria-expanded","false"); }
+    function toggle(){ cal.classList.contains("is-open") ? close() : open(); }
+
+    if(iconBtn) iconBtn.addEventListener("click", function(e){ e.stopPropagation(); toggle(); });
+    input.addEventListener("click", function(e){ e.stopPropagation(); toggle(); });
+    if(prevBtn) prevBtn.addEventListener("click", function(e){ e.stopPropagation(); view.setMonth(view.getMonth()-1); render(); });
+    if(nextBtn) nextBtn.addEventListener("click", function(e){ e.stopPropagation(); view.setMonth(view.getMonth()+1); render(); });
+    cal.addEventListener("click", function(e){ e.stopPropagation(); });
+    document.addEventListener("click", function(e){ if(!wrap.contains(e.target)) close(); });
+    document.addEventListener("keydown", function(e){ if(e.key === "Escape") close(); });
+  }
+
+  Array.prototype.slice.call(document.querySelectorAll(".s7-datewrap")).forEach(initDatePicker);
+})();
+
+/* ---- booking modal — opened by every [data-book] button (Book a Test Drive / Reserve) ---- */
+(function(){
+  "use strict";
+  var modal = document.getElementById("bookModal");
+  if(!modal) return;
+  var lastFocus = null;
+
+  function openModal(){
+    lastFocus = document.activeElement;
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden","false");
+    document.body.style.overflow = "hidden";
+    var f = modal.querySelector("#bf-email"); if(f){ try{ f.focus(); }catch(e){} }
+  }
+  function closeModal(){
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden","true");
+    document.body.style.overflow = "";
+    if(lastFocus){ try{ lastFocus.focus(); }catch(e){} }
+  }
+
+  Array.prototype.slice.call(document.querySelectorAll("[data-book]")).forEach(function(btn){
+    btn.addEventListener("click", function(e){ e.preventDefault(); openModal(); });
+  });
+  Array.prototype.slice.call(modal.querySelectorAll("[data-book-close]")).forEach(function(el){
+    el.addEventListener("click", closeModal);
+  });
+  var mform = modal.querySelector("form");
+  if(mform){ mform.addEventListener("submit", function(e){ e.preventDefault(); closeModal(); }); }
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape" && modal.classList.contains("is-open")) closeModal(); });
+})();
+</script>
+</body>
+</html>
